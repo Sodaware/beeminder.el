@@ -102,17 +102,16 @@
 
 (defun beeminder-on-org-task-completed ()
   "Fires when an 'org-mode' task is marked as DONE."
-  (interactive)
   ;; Only fire if task is complete and a beeminder task
   (when (and (org-entry-is-done-p) (org-entry-get (point) "beeminder" t))
-      
+
       ;; If "value" property set, use that as the data, otherwise default to 1
       (let* ((datapoint (or (org-entry-get (point) "value" t) 1))
-             (title (nth 4 (org-heading-components)))
-             (goal (org-entry-get (point) "beeminder" t)))
-        
-        ;; Send to beeminder
-        (beeminder-add-data goal datapoint title))))
+	     (title (nth 4 (org-heading-components)))
+	     (goal (org-entry-get (point) "beeminder" t)))
+
+	;; Send to beeminder
+	(beeminder-add-data goal datapoint title))))
 
 (add-hook 'org-after-todo-state-change-hook 'beeminder-on-org-task-completed)
 
@@ -128,30 +127,30 @@
 (defun beeminder-my-goals ()
   "Displays your goals in the Message buffer (kind of useless)."
   (interactive)
-  (message 
+  (message
    "%s"
    (mapconcat (lambda (goal)
-		(format "Goal: %s" (assoc-default 'title goal))) 
+		(format "Goal: %s" (assoc-default 'title goal)))
 	      (beeminder-fetch-goals beeminder-username)
 	      "\n")))
 
 (defun beeminder-refresh-goal ()
   "Fetch data for the current goal headline and update it."
   (interactive)
-  
+
   ;; Get the goal at current point
   (when (org-entry-get (point) "beeminder" t)
-    
+
     (let* ((goal (org-entry-get (point) "beeminder" t))
 	   ;; Get the updated goal from Beeminder
 	   (result (beeminder-fetch-goal beeminder-username goal)))
-      
+
       ;; Update properties
       (org-entry-put (point) "pledge" (format "%s" (cdr (assoc 'pledge result))))
       (org-entry-put (point) "type"   (cdr (assoc 'goal_type result)))
       (org-entry-put (point) "target" (format "%s" (cdr (assoc 'goalval result))))
       (org-entry-put (point) "lane"   (format "%s" (cdr (assoc 'lane result))))
-                     
+
       ;; Update deadline
       (org-deadline nil (format-time-string "%Y-%m-%d %a %H:%M" (seconds-to-time (assoc-default 'goaldate result)))))))
 
@@ -161,9 +160,9 @@
 (defun beeminder-my-goals-org ()
   "Insert your Beeminder goals as an 'org-mode' headline list."
   (interactive)
-  
+
   ;; Insert the main headline
-  (insert 
+  (insert
    (format "* Beeminder goals for %s\n" beeminder-username)
    (mapconcat
     (lambda (goal)
@@ -175,18 +174,18 @@
 		      "   :type:   %s\n"
 		      "   :pledge: %s\n"
 		      "   :target: %s\n"
-                      "   :STYLE: habit\n"
+		      "   :STYLE: habit\n"
 		      "   :END:\n")
-	      (assoc-default 'title goal) 
+	      (assoc-default 'title goal)
 	      beeminder-goal-org-tags
-	      (format-time-string 
-	       "%Y-%m-%d %a %H:%M" 
+	      (format-time-string
+	       "%Y-%m-%d %a %H:%M"
 	       (seconds-to-time (assoc-default 'losedate goal)))
 	      (assoc-default 'slug goal)
 	      (assoc-default 'goal_type goal)
 	      (assoc-default 'pledge goal)
 	      (assoc-default 'goalval goal)))
-    (beeminder-fetch-goals beeminder-username) 
+    (beeminder-fetch-goals beeminder-username)
     "\n")))
 
 ;; Main API Endpoints
@@ -223,24 +222,24 @@
 (defun beeminder-fetch (action)
   "Perform ACTION on the Beeminder API."
   (let* ((action (if (symbolp action) (symbol-name action) action))
-         (url (format "%s%s" beeminder-v1-api action)))
+	 (url (format "%s%s" beeminder-v1-api action)))
     (with-current-buffer (url-retrieve-synchronously url)
       (goto-char (point-min))
       (goto-char url-http-end-of-headers)
       (prog1 (json-read)
-        (kill-buffer)))))
+	(kill-buffer)))))
 
 ;;;###autoload
 (defun beeminder-post (action args)
   "Perform a POST request to ACTION with ARGS."
   (let* ((url-request-method "POST")
-         (url-request-data args)
-         (url (format "%s%s" beeminder-v1-api action)))
+	 (url-request-data args)
+	 (url (format "%s%s" beeminder-v1-api action)))
     (with-current-buffer (url-retrieve-synchronously url)
       (goto-char (point-min))
       (goto-char url-http-end-of-headers)
       (prog1 (json-read)
-        (kill-buffer)))))
+	(kill-buffer)))))
 
 
 (provide 'beeminder)
