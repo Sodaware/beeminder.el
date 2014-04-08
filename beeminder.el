@@ -42,10 +42,18 @@
 
 ;;; Keyboard bindings:
 
-;; All keyboard bindings have a C-c b prefix
+;; We recommend binding the commands to the C-c b prefix
 
 ;; C-c b g    - Insert your goals as an org-mode list
 ;; C-c b m    - Display username in message line
+
+;; To do so, add these to your init.el:
+
+;; (global-set-key "\C-cba" 'beeminder-add-data)
+;; (global-set-key "\C-cbw" 'beeminder-whoami)
+;; (global-set-key "\C-cbg" 'beeminder-my-goals-org)
+;; (global-set-key "\C-cbr" 'beeminder-refresh-goal)
+
 
 ;;; TODO:
 
@@ -93,14 +101,6 @@
 (defconst beeminder-v1-api
   "https://www.beeminder.com/api/v1/"
   "The endpoint for version 1.0 of the Beeminder API.")
-
-
-;; Keyboard Bindings
-
-(global-set-key "\C-cba" 'beeminder-add-data)
-(global-set-key "\C-cbw" 'beeminder-whoami)
-(global-set-key "\C-cbg" 'beeminder-my-goals-org)
-(global-set-key "\C-cbr" 'beeminder-refresh-goal)
 
 
 ;; org-mode hooks
