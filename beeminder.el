@@ -92,7 +92,7 @@
 
 (defconst beeminder-v1-api
   "https://www.beeminder.com/api/v1/"
-  "The endpoint for the Beeminder API (version 1.0).")
+  "The endpoint for version 1.0 of the Beeminder API.")
 
 
 ;; Keyboard Bindings
@@ -100,6 +100,7 @@
 (global-set-key "\C-cba" 'beeminder-add-data)
 (global-set-key "\C-cbw" 'beeminder-whoami)
 (global-set-key "\C-cbg" 'beeminder-my-goals-org)
+(global-set-key "\C-cbr" 'beeminder-refresh-goal)
 
 
 ;; org-mode hooks
@@ -142,6 +143,27 @@
             (message "Goal: %s" (assoc-default 'title goal))))
         beeminder-scratch))
 
+(defun beeminder-refresh-goal ()
+  "Fetch data for the current goal headline and update it."
+  (interactive)
+  
+  ;; Get the goal at current point
+  (when (org-entry-get (point) "beeminder" t)
+    
+    (let* ((goal (org-entry-get (point) "beeminder" t)))
+      
+      ;; Get the updated goal from Beeminder
+      (beeminder-fetch-goal beeminder-username goal)
+      
+      ;; Update properties
+      (org-entry-put (point) "pledge" (format "%s" (cdr (assoc 'pledge beeminder-scratch))))
+      (org-entry-put (point) "type"   (cdr (assoc 'goal_type beeminder-scratch)))
+      (org-entry-put (point) "target" (format "%s" (cdr (assoc 'goalval beeminder-scratch))))
+      (org-entry-put (point) "lane"   (format "%s" (cdr (assoc 'lane beeminder-scratch))))
+                     
+      ;; Update deadline
+      (org-deadline nil (format-time-string "%Y-%m-%d %a %H:%M" (seconds-to-time (assoc-default 'goaldate beeminder-scratch)))))))
+
 
 ;; ORG-Mode stuff
 
@@ -169,6 +191,7 @@
        ;; Insert goal properties
        (insert "   :PROPERTIES:\n")
        
+       (insert (format "   :beeminder: %s\n" (assoc-default 'slug goal)))
        (insert (format "   :type:   %s\n" (assoc-default 'goal_type goal)))
        (insert (format "   :pledge: %s\n" (assoc-default 'pledge goal)))
        (insert (format "   :target: %s\n" (assoc-default 'goalval goal)))
@@ -184,6 +207,12 @@
   (setq beeminder-scratch
         (beeminder-fetch
          (format "users/%s/goals.json?auth_token=%s" username beeminder-auth-token))))
+
+(defun beeminder-fetch-goal (username goal)
+  "Fetch data for USERNAME's GOAL."
+  (setq beeminder-scratch
+        (beeminder-fetch
+         (format "users/%s/goals/%s.json?auth_token=%s" username goal beeminder-auth-token))))
 
 (defun beeminder-add-data (goal value comment)
   "Update Beeminder GOAL with VALUE and COMMENT."
