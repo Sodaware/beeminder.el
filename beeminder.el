@@ -4,6 +4,9 @@
 
 ;; Author: Phil Newton <phil@sodaware.net>
 ;; Keywords: beeminder
+;; URL: http://www.philnewton.net/code/beeminder-el/
+;; Created: March 22nd, 2014
+;; Version: 1.0.0
 
 ;; This file is NOT part of GNU Emacs.
 
@@ -29,7 +32,7 @@
 ;;; Commentary:
 
 ;; beeminder.el provides a simple way for Emacs to interact with the Beeminder
-;; API. It's pretty basic at the moment, but can be used to fetch and submit
+;; API.  It's pretty basic at the moment, but can be used to fetch and submit
 ;; data.
 
 ;; Please set `beeminder-username' and `beeminder-auth-token' before using.
@@ -50,7 +53,14 @@
 
 ;;; Code:
 
+;; Dependencies
+
 (require 'json)
+(require 'org)
+
+(defvar url-http-end-of-headers)
+(defvar org-state)
+
 
 ;; Configuration
 
@@ -60,17 +70,17 @@
   :prefix "beeminder-")
 
 (defcustom beeminder-username nil
-  "Your Beeminder username"
+  "Your Beeminder username."
   :group 'beeminder
   :type '(string))
 
 (defcustom beeminder-auth-token nil
-  "Your Beeminder API key"
+  "Your Beeminder API key."
   :group 'beeminder
   :type '(string))
 
 (defcustom beeminder-goal-org-tags ":GOAL:BEEMINDER:"
-  "Tags that will be applied to inserted goal headlines"
+  "Tags that will be applied to inserted goal headlines."
   :group 'beeminder
   :type '(string))
 
@@ -82,7 +92,7 @@
 
 (defconst beeminder-v1-api
   "https://www.beeminder.com/api/v1/"
-  "The endpoint for the Beeminder API (version 1.0)")
+  "The endpoint for the Beeminder API (version 1.0).")
 
 
 ;; Keyboard Bindings
@@ -95,7 +105,7 @@
 ;; org-mode hooks
 
 (defun beeminder-on-org-task-completed ()
-  "Fires when an org-mode task is marked as DONE"
+  "Fires when an 'org-mode' task is marked as DONE."
   (interactive)
 
   ;; Only fire if task is complete and a beeminder task
@@ -110,20 +120,20 @@
         ;; Send to beeminder
         (beeminder-add-data goal datapoint title)))))
 
-(add-hook 'org-after-todo-state-change-hook 'beeminder-on-org-task-completed) 
+(add-hook 'org-after-todo-state-change-hook 'beeminder-on-org-task-completed)
 
 
 ;; Functions
 
 (defun beeminder-whoami ()
-  "Displays the Beeminder username for your auth token"
+  "Displays the Beeminder username for your auth token."
   (interactive)
   (setq beeminder-scratch
         (beeminder-fetch (format "users/me.json?auth_token=%s" beeminder-auth-token)))
   (message "Your Beeminder Username: %s" (assoc-default 'username beeminder-scratch)))
 
 (defun beeminder-my-goals ()
-  "Displays your goals in the Message buffer (kind of useless)"
+  "Displays your goals in the Message buffer (kind of useless)."
   (interactive)
   (beeminder-fetch-goals beeminder-username)
   
@@ -136,7 +146,7 @@
 ;; ORG-Mode stuff
 
 (defun beeminder-my-goals-org ()
-  "Inserts your Beeminder goals as an org-mode headline list"
+  "Insert your Beeminder goals as an 'org-mode' headline list."
   (interactive)
   
   ;; Fetch the current user's goals
@@ -170,13 +180,13 @@
 ;; Main API Endpoints
 
 (defun beeminder-fetch-goals (username)
-  "Fetch a list of all goals for a single username"
+  "Fetch a list of all goals for a single USERNAME."
   (setq beeminder-scratch
-        (beeminder-fetch 
+        (beeminder-fetch
          (format "users/%s/goals.json?auth_token=%s" username beeminder-auth-token))))
 
 (defun beeminder-add-data (goal value comment)
-  "Post data to a Beeminder goal"
+  "Update Beeminder GOAL with VALUE and COMMENT."
   (interactive "MGoal: \nnValue: \nMComment: \n")
   
   ;; Send the request
@@ -189,7 +199,7 @@
                  (url-hexify-string comment))))
   
   ;; Show what happened
-  (message 
+  (message
    "Data added at %s"
    (format-time-string "%Y-%m-%d %a %H:%M:%S" (seconds-to-time (assoc-default 'timestamp beeminder-scratch)))))
 
@@ -197,7 +207,7 @@
 ;; GET/POST Helpers
 
 (defun beeminder-fetch (action)
-  "Perform a request to the Beeminder API."
+  "Perform ACTION on the Beeminder API."
   (let* ((action (if (symbolp action) (symbol-name action) action))
          (url (format "%s%s" beeminder-v1-api action)))
     (with-current-buffer (url-retrieve-synchronously url)
@@ -206,8 +216,9 @@
       (prog1 (json-read)
         (kill-buffer)))))
 
+;;;###autoload
 (defun beeminder-post (action args)
-  "Perform a POST request to the Beeminder API."
+  "Perform a POST request to ACTION with ARGS."
   (let* ((url-request-method "POST")
          (url-request-data args)
          (url (format "%s%s" beeminder-v1-api action)))
@@ -219,3 +230,4 @@
 
 
 (provide 'beeminder)
+;;; beeminder.el ends here
