@@ -65,9 +65,7 @@
 
 (require 'json)
 (require 'org)
-
-(defvar url-http-end-of-headers)
-(defvar org-state)
+(require 'url-http)
 
 
 ;; Configuration
@@ -92,9 +90,6 @@
   :group 'beeminder
   :type '(string))
 
-(defvar beeminder-scratch)
-(make-variable-buffer-local 'beeminder-scratch)
-
 (defvar beeminder-request-data nil
   "An assoc list of parameter names to values.")
 
@@ -107,19 +102,16 @@
 
 (defun beeminder-on-org-task-completed ()
   "Fires when an 'org-mode' task is marked as DONE."
-  (interactive)
-
   ;; Only fire if task is complete and a beeminder task
-  (when (string= org-state "DONE")
-    (when (org-entry-get (point) "beeminder" t)
-      
+  (when (and (org-entry-is-done-p) (org-entry-get (point) "beeminder" t))
+
       ;; If "value" property set, use that as the data, otherwise default to 1
       (let* ((datapoint (or (org-entry-get (point) "value" t) 1))
-             (title (nth 4 (org-heading-components)))
-             (goal (org-entry-get (point) "beeminder" t)))
-        
-        ;; Send to beeminder
-        (beeminder-add-data goal datapoint title)))))
+	     (title (nth 4 (org-heading-components)))
+	     (goal (org-entry-get (point) "beeminder" t)))
+
+	;; Send to beeminder
+	(beeminder-add-data goal datapoint title))))
 
 (add-hook 'org-after-todo-state-change-hook 'beeminder-on-org-task-completed)
 
@@ -129,40 +121,38 @@
 (defun beeminder-whoami ()
   "Displays the Beeminder username for your auth token."
   (interactive)
-  (setq beeminder-scratch
-        (beeminder-fetch (format "users/me.json?auth_token=%s" beeminder-auth-token)))
-  (message "Your Beeminder Username: %s" (assoc-default 'username beeminder-scratch)))
+  (let ((result (beeminder-fetch (format "users/me.json?auth_token=%s" beeminder-auth-token))))
+    (message "Your Beeminder username: %s" (assoc-default 'username result))))
 
 (defun beeminder-my-goals ()
   "Displays your goals in the Message buffer (kind of useless)."
   (interactive)
-  (beeminder-fetch-goals beeminder-username)
-  
-  (mapc (lambda (goal)
-          (progn
-            (message "Goal: %s" (assoc-default 'title goal))))
-        beeminder-scratch))
+  (message
+   "%s"
+   (mapconcat (lambda (goal)
+		(format "Goal: %s" (assoc-default 'title goal)))
+	      (beeminder-fetch-goals beeminder-username)
+	      "\n")))
 
 (defun beeminder-refresh-goal ()
   "Fetch data for the current goal headline and update it."
   (interactive)
-  
+
   ;; Get the goal at current point
   (when (org-entry-get (point) "beeminder" t)
-    
-    (let* ((goal (org-entry-get (point) "beeminder" t)))
-      
-      ;; Get the updated goal from Beeminder
-      (beeminder-fetch-goal beeminder-username goal)
-      
+
+    (let* ((goal (org-entry-get (point) "beeminder" t))
+	   ;; Get the updated goal from Beeminder
+	   (result (beeminder-fetch-goal beeminder-username goal)))
+
       ;; Update properties
-      (org-entry-put (point) "pledge" (format "%s" (cdr (assoc 'pledge beeminder-scratch))))
-      (org-entry-put (point) "type"   (cdr (assoc 'goal_type beeminder-scratch)))
-      (org-entry-put (point) "target" (format "%s" (cdr (assoc 'goalval beeminder-scratch))))
-      (org-entry-put (point) "lane"   (format "%s" (cdr (assoc 'lane beeminder-scratch))))
-                     
+      (org-entry-put (point) "pledge" (format "%s" (cdr (assoc 'pledge result))))
+      (org-entry-put (point) "type"   (cdr (assoc 'goal_type result)))
+      (org-entry-put (point) "target" (format "%s" (cdr (assoc 'goalval result))))
+      (org-entry-put (point) "lane"   (format "%s" (cdr (assoc 'lane result))))
+
       ;; Update deadline
-      (org-deadline nil (format-time-string "%Y-%m-%d %a %H:%M" (seconds-to-time (assoc-default 'goaldate beeminder-scratch)))))))
+      (org-deadline nil (format-time-string "%Y-%m-%d %a %H:%M" (seconds-to-time (assoc-default 'goaldate result)))))))
 
 
 ;; ORG-Mode stuff
@@ -170,67 +160,61 @@
 (defun beeminder-my-goals-org ()
   "Insert your Beeminder goals as an 'org-mode' headline list."
   (interactive)
-  
-  ;; Fetch the current user's goals
-  (beeminder-fetch-goals beeminder-username)
-  
+
   ;; Insert the main headline
-  (insert (format "* Beeminder goals for %s\n" beeminder-username))
-  
-  ;; Insert each goal
-  (mapc
-   (lambda (goal)
-     (progn
-       
-       ;; Insert the goal name and tags
-       (insert (format "** TODO %s %s\n" (assoc-default 'title goal) beeminder-goal-org-tags))
-       
-       ;; Insert deadline
-       (insert (format "   DEADLINE: <%s>\n" (format-time-string "%Y-%m-%d %a %H:%M" (seconds-to-time (assoc-default 'goaldate goal)))))
-
-       ;; Insert goal properties
-       (insert "   :PROPERTIES:\n")
-       
-       (insert (format "   :beeminder: %s\n" (assoc-default 'slug goal)))
-       (insert (format "   :type:   %s\n" (assoc-default 'goal_type goal)))
-       (insert (format "   :pledge: %s\n" (assoc-default 'pledge goal)))
-       (insert (format "   :target: %s\n" (assoc-default 'goalval goal)))
-       
-       (insert "   :END:\n")))
-   beeminder-scratch))
-
+  (insert
+   (format "* Beeminder goals for %s\n" beeminder-username)
+   (mapconcat
+    (lambda (goal)
+      ;; Insert the goal name and tags
+      (format (concat "** TODO %s %s\n"
+		      "  DEADLINE: <%s>\n"
+		      "   :PROPERTIES:\n"
+		      "   :beeminder: %s\n"
+		      "   :type:   %s\n"
+		      "   :pledge: %s\n"
+		      "   :target: %s\n"
+		      "   :STYLE: habit\n"
+		      "   :END:\n")
+	      (assoc-default 'title goal)
+	      beeminder-goal-org-tags
+	      (format-time-string
+	       "%Y-%m-%d %a %H:%M"
+	       (seconds-to-time (assoc-default 'losedate goal)))
+	      (assoc-default 'slug goal)
+	      (assoc-default 'goal_type goal)
+	      (assoc-default 'pledge goal)
+	      (assoc-default 'goalval goal)))
+    (beeminder-fetch-goals beeminder-username)
+    "\n")))
 
 ;; Main API Endpoints
 
-(defun beeminder-fetch-goals (username)
+(defun beeminder-fetch-goals (&optional username)
   "Fetch a list of all goals for a single USERNAME."
-  (setq beeminder-scratch
-        (beeminder-fetch
-         (format "users/%s/goals.json?auth_token=%s" username beeminder-auth-token))))
+  (beeminder-fetch
+   (format "users/%s/goals.json?auth_token=%s" (or username beeminder-username) beeminder-auth-token)))
 
 (defun beeminder-fetch-goal (username goal)
   "Fetch data for USERNAME's GOAL."
-  (setq beeminder-scratch
-        (beeminder-fetch
-         (format "users/%s/goals/%s.json?auth_token=%s" username goal beeminder-auth-token))))
+  (beeminder-fetch
+   (format "users/%s/goals/%s.json?auth_token=%s" username goal beeminder-auth-token)))
 
 (defun beeminder-add-data (goal value comment)
   "Update Beeminder GOAL with VALUE and COMMENT."
   (interactive "MGoal: \nnValue: \nMComment: \n")
-  
-  ;; Send the request
-  (setq beeminder-scratch
-        (beeminder-post
-         (format "users/%s/goals/%s/datapoints.json" beeminder-username goal)
-         (format "auth_token=%s&value=%s&comment=%s"
-                 beeminder-auth-token
-                 value
-                 (url-hexify-string comment))))
-  
-  ;; Show what happened
-  (message
-   "Data added at %s"
-   (format-time-string "%Y-%m-%d %a %H:%M:%S" (seconds-to-time (assoc-default 'timestamp beeminder-scratch)))))
+  (let ((result
+	 ;; Send the request
+	 (beeminder-post
+	  (format "users/%s/goals/%s/datapoints.json" beeminder-username goal)
+	  (format "auth_token=%s&value=%s&comment=%s"
+		  beeminder-auth-token
+		  value
+		  (url-hexify-string comment)))))
+    ;; Show what happened
+    (message
+     "Data added at %s"
+     (format-time-string "%Y-%m-%d %a %H:%M:%S" (seconds-to-time (assoc-default 'timestamp result))))))
 
 
 ;; GET/POST Helpers
@@ -238,24 +222,24 @@
 (defun beeminder-fetch (action)
   "Perform ACTION on the Beeminder API."
   (let* ((action (if (symbolp action) (symbol-name action) action))
-         (url (format "%s%s" beeminder-v1-api action)))
+	 (url (format "%s%s" beeminder-v1-api action)))
     (with-current-buffer (url-retrieve-synchronously url)
       (goto-char (point-min))
       (goto-char url-http-end-of-headers)
       (prog1 (json-read)
-        (kill-buffer)))))
+	(kill-buffer)))))
 
 ;;;###autoload
 (defun beeminder-post (action args)
   "Perform a POST request to ACTION with ARGS."
   (let* ((url-request-method "POST")
-         (url-request-data args)
-         (url (format "%s%s" beeminder-v1-api action)))
+	 (url-request-data args)
+	 (url (format "%s%s" beeminder-v1-api action)))
     (with-current-buffer (url-retrieve-synchronously url)
       (goto-char (point-min))
       (goto-char url-http-end-of-headers)
       (prog1 (json-read)
-        (kill-buffer)))))
+	(kill-buffer)))))
 
 
 (provide 'beeminder)
