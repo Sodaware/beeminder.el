@@ -96,6 +96,7 @@
     (goal_type . "beeminder-type")
     (goalval . "beeminder-target")
     (lane . "beeminder-lane")
+    (value . "beeminder-value")
     (progress . "beeminder-progress"))
   "Alist mapping property names for Beeminder goals.
 The key should be the symbol that the Beeminder API returns, and the
@@ -116,7 +117,7 @@ value should be the name of the property updated in Org."
 (defun beeminder-on-org-task-completed ()
   "Fires when an 'org-mode' task is marked as DONE."
   ;; Only fire if task is complete and a beeminder task
-  (when (and (org-entry-is-done-p)
+  (when (and (member org-state org-done-keywords)
 	     (org-entry-get (point) (assoc-default 'slug beeminder-properties) t))
 
       ;; If "value" property set, use that as the data, otherwise default to 1
