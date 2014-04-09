@@ -120,7 +120,7 @@ value should be the name of the property updated in Org."
 	     (org-entry-get (point) (assoc-default 'slug beeminder-properties) t))
 
       ;; If "value" property set, use that as the data, otherwise default to 1
-      (let* ((datapoint (or (org-entry-get (point) (cdr (assoc "value" beeminder-properties)) t) 1))
+      (let* ((datapoint (or (org-entry-get (point) (assoc-default 'value beeminder-properties) t) 1))
 	     (title (nth 4 (org-heading-components)))
 	     (goal (org-entry-get (point) (assoc-default 'slug beeminder-properties) t)))
 
