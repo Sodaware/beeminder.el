@@ -82,8 +82,21 @@
   :group 'beeminder
   :type '(string))
 
-(defvar beeminder-request-data nil
-  "An assoc list of parameter names to values.")
+(defcustom beeminder-properties
+  '((slug . "beeminder")
+    (pledge . "beeminder-pledge")
+    (goal_type . "beeminder-type")
+    (goalval . "beeminder-target")
+    (lane . "beeminder-lane")
+    (progress . "beeminder-progress"))
+  "Alist mapping property names for Beeminder goals.
+The key should be the symbol that the Beeminder API returns, and the
+value should be the name of the property updated in Org."
+  :group 'beeminder
+  :type '(repeat
+	  (cons
+	   (symbol "Symbol")
+	   (string "Property name"))))
 
 (defconst beeminder-v1-api
   "https://www.beeminder.com/api/v1/"
@@ -103,12 +116,13 @@
 (defun beeminder-on-org-task-completed ()
   "Fires when an 'org-mode' task is marked as DONE."
   ;; Only fire if task is complete and a beeminder task
-  (when (and (org-entry-is-done-p) (org-entry-get (point) "beeminder" t))
+  (when (and (org-entry-is-done-p)
+	     (org-entry-get (point) (assoc-default 'slug beeminder-properties) t))
 
       ;; If "value" property set, use that as the data, otherwise default to 1
-      (let* ((datapoint (or (org-entry-get (point) "value" t) 1))
+      (let* ((datapoint (or (org-entry-get (point) (cdr (assoc "value" beeminder-properties)) t) 1))
 	     (title (nth 4 (org-heading-components)))
-	     (goal (org-entry-get (point) "beeminder" t)))
+	     (goal (org-entry-get (point) (assoc-default 'slug beeminder-properties) t)))
 
 	;; Send to beeminder
 	(beeminder-add-data goal datapoint title))))
@@ -139,20 +153,36 @@
   (interactive)
 
   ;; Get the goal at current point
-  (when (org-entry-get (point) "beeminder" t)
+  (when (org-entry-get (point) (assoc-default 'slug beeminder-properties) t)
 
-    (let* ((goal (org-entry-get (point) "beeminder" t))
+    (let* ((goal (org-entry-get (point) (assoc-default 'slug beeminder-properties) t))
 	   ;; Get the updated goal from Beeminder
 	   (result (beeminder-fetch-goal beeminder-username goal)))
 
       ;; Update properties
-      (org-entry-put (point) "pledge" (format "%s" (cdr (assoc 'pledge result))))
-      (org-entry-put (point) "type"   (cdr (assoc 'goal_type result)))
-      (org-entry-put (point) "target" (format "%s" (cdr (assoc 'goalval result))))
-      (org-entry-put (point) "lane"   (format "%s" (cdr (assoc 'lane result))))
+      (mapc (lambda (prop)
+	      (when (assoc (car prop) result)
+		(org-entry-put (point)
+			       (cdr prop)
+			       (format "%s"
+				       (assoc-default (car prop) result)))))
+	    beeminder-properties)
+      ;; Add percentage
+      (when (cdr (assoc 'goalval result))
+	(org-entry-put (point)
+		       (cdr (assoc 'progress beeminder-properties))
+		       (format "%d%%"
+			       (/ (* 100.0
+				     (assoc-default 'curval result nil 0))
+				  (assoc-default 'goalval result nil 0)))))
 
       ;; Update deadline
-      (org-deadline nil (format-time-string "%Y-%m-%d %a %H:%M" (seconds-to-time (assoc-default 'goaldate result)))))))
+      (org-deadline nil
+		    (format-time-string
+		     "%Y-%m-%d %a %H:%M"
+		     (seconds-to-time
+		      (or (assoc-default 'losedate result)
+			  (assoc-default 'goaldate result))))))))
 
 
 ;; ORG-Mode stuff
@@ -169,11 +199,12 @@
       ;; Insert the goal name and tags
       (format (concat "** TODO %s %s\n"
 		      "  DEADLINE: <%s>\n"
+     		      "  SCHEDULED: <%s .+1w>\n"
 		      "   :PROPERTIES:\n"
-		      "   :beeminder: %s\n"
-		      "   :type:   %s\n"
-		      "   :pledge: %s\n"
-		      "   :target: %s\n"
+		      "   :%s: %s\n"
+		      "   :%s: %s\n"
+		      "   :%s: %s\n"
+		      "   :%s: %s\n"
 		      "   :STYLE: habit\n"
 		      "   :END:\n")
 	      (assoc-default 'title goal)
@@ -181,9 +212,16 @@
 	      (format-time-string
 	       "%Y-%m-%d %a %H:%M"
 	       (seconds-to-time (assoc-default 'losedate goal)))
+	      (format-time-string
+	       "%Y-%m-%d %a"
+	       (current-time))
+	      (assoc-default 'slug beeminder-properties)
 	      (assoc-default 'slug goal)
+	      (assoc-default 'goal_type beeminder-properties)
 	      (assoc-default 'goal_type goal)
+	      (assoc-default 'pledge beeminder-properties)
 	      (assoc-default 'pledge goal)
+	      (assoc-default 'goalval beeminder-properties)
 	      (assoc-default 'goalval goal)))
     (beeminder-fetch-goals beeminder-username)
     "\n")))
