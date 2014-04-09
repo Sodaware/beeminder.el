@@ -152,7 +152,7 @@
       (org-entry-put (point) "lane"   (format "%s" (cdr (assoc 'lane result))))
 
       ;; Update deadline
-      (org-deadline nil (format-time-string "%Y-%m-%d %a %H:%M" (seconds-to-time (assoc-default 'goaldate result)))))))
+      (org-deadline nil (format-time-string "%Y-%m-%d %a %H:%M" (seconds-to-time (assoc-default 'losedate result)))))))
 
 
 ;; ORG-Mode stuff
