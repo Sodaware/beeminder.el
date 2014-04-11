@@ -59,6 +59,7 @@
 (require 'org)
 (require 'url-http)
 
+(defvar org-state)
 
 ;; Configuration
 
@@ -124,9 +125,9 @@ value should be the name of the property updated in Org."
       (let* ((datapoint (or (org-entry-get (point) (assoc-default 'value beeminder-properties) t) 1))
 	     (title (nth 4 (org-heading-components)))
 	     (goal (org-entry-get (point) (assoc-default 'slug beeminder-properties) t)))
-
 	;; Send to beeminder
-	(beeminder-add-data goal datapoint title))))
+	(beeminder-add-data goal datapoint title)
+	(beeminder-refresh-goal))))
 
 (add-hook 'org-after-todo-state-change-hook 'beeminder-on-org-task-completed)
 
