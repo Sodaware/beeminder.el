@@ -60,6 +60,7 @@
 (require 'url-http)
 
 (defvar org-state)
+(defvar url-http-end-of-headers)
 
 ;; Configuration
 
