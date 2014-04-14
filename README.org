@@ -7,7 +7,7 @@ This is very much in the early stages, so there's not really any error checking.
 It's designed to integrate with org-mode, and adds support for submitting data
 directly to Beeminder when a task is closed (see usage for some examples).
 
-Thanks to Sacha Chau for providing the inspiration and initial code for this
+Thanks to Sacha Chua for providing the inspiration and initial code for this
 extension: https://gist.github.com/sachac/9700455
 
 
@@ -17,36 +17,43 @@ All Emacs installs are a little different, but the basic outline is this:
 
   - Download the source code and put it somewhere Emacs can find it (probably
     =~/.emacs.d/=)
-  - Add =(require 'beeminder)= somewhere in your Emacs startup
+  - Add that directory to your =load-path= if it's not yet there: =(add-to-list 'load-path "/path/to/dir")=
+  - Add =(require 'beeminder)= somewhere in your =~/.emacs.d/init.el=
   - Set your API authorization token and Beeminder username configuration
-    variables using the following:
+    variables. You can find your token by logging into Beeminder and then visiting the following URI: https://www.beeminder.com/api/v1/auth_token.json
+    To set it in Emacs, add the following code (or use =M-x customize=):
 
-#+BEGIN_EXAMPLE
+#+BEGIN_SRC emacs-lisp
 (setq beeminder-username "username")
 (setq beeminder-auth-token "token")
-#+END_EXAMPLE
-    
-You can find your token by logging into Beeminder and then visiting the
-following URI: https://www.beeminder.com/api/v1/auth_token.json
+#+END_SRC
+  
+  - Set up your keyboard shortcuts. Here are some recommendations:
 
+#+begin_src emacs-lisp
+(global-set-key "\C-cba" 'beeminder-add-data)
+(global-set-key "\C-cbw" 'beeminder-whoami)
+(global-set-key "\C-cbg" 'beeminder-my-goals-org)
+(global-set-key "\C-cbr" 'beeminder-refresh-goal)
+#+end_src    
 
 ** Usage
 
-** New Shortcuts
+*** New Shortcuts
 
-=beeminder.el= adds the following shortcuts:
+The recommended settings above will add the following keyboard shortcuts:
 
-=C-c b a= - Add data to a Beeminder goal. Prompts for the goal identifier, a
-numeric value and an (optional) comment
+=C-c b a= (=beeminder-add-data=) - Add data to a Beeminder goal. Prompts for the goal identifier, a
+numeric value and an optional comment.
 
-=C-c b g= - Fetches all of your goals from Beeminder and inserts them as a list
+=C-c b g= (=beeminder-my-goals-org=) - Fetches all of your goals from Beeminder and inserts them as a list
 of org-mode headlines.
 
-=C-c b w= - Fetches your username from Beeminder. Not really useful, but good
-for checking if your authorization token is set and valid
+=C-c b w= (=beeminder-whoami=) - Fetches your username from Beeminder. Not really useful, but good
+for checking if your authorization token is set and valid.
 
 
-** Integrating with org-mode
+*** Integrating with org-mode
 
 This extension listens for changes to the state of org-mode todo items, and can
 automatically add data to Beeminder once a task is complete. In order to do
@@ -58,13 +65,13 @@ complete. If no "=value=" property is set, the value will default to 1.
 
 Here's an example:
 
-#+BEGIN_EXAMPLE
-* Beeminder.el Tasks
-  :PROPERTIES:
-  :beeminder: beeminder-el
-  :END:
-** TODO Write documentation
-#+END_EXAMPLE
+#+BEGIN_SRC org
+,* Beeminder.el Tasks
+   :PROPERTIES:
+   :beeminder: beeminder-el
+   :END:
+,** TODO Write documentation
+#+END_SRC
 
 When "Write documentation" is changed to "DONE", =beeminder.el= will submit a
 value of "1" to the "=beeminder-el=" goal.
