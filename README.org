@@ -57,11 +57,15 @@ for checking if your authorization token is set and valid.
 
 This extension listens for changes to the state of org-mode todo items, and can
 automatically add data to Beeminder once a task is complete. In order to do
-this, the task (or its ancestors) must have a "=beeminder=" property that is set
+this, the task (or its ancestors) must have a =beeminder= property that is set
 to the name of the goal to add to.
 
-Tasks can also set a "=value=" property, which will be sent when the task is
-complete. If no "=value=" property is set, the value will default to 1.
+Tasks can also set a =beeminder-value= property, which will be sent
+when the task is complete. If no =beeminder-value= property is set,
+the value will default to 1. You can set =beeminder-value= to =prompt=
+in order to interactively specify the data point when you complete the
+task, or set =beeminder-value= to =time-today= in order to clock the
+time today.
 
 Here's an example:
 
