@@ -47,12 +47,16 @@
 ;; C-c b g    - Insert your goals as an org-mode list
 ;; C-c b m    - Display username in message line
 
-;; You can use C-c C-x p (org-set-property) to add the beeminder-slug
+;; You can use C-c C-x p (org-set-property) to add the beeminder
 ;; property to projects or tasks that are associated with beeminder
 ;; goals. Set it to the identifier of your goal (the short name that's
-;; in the URL). By default, completing those tasks will log one point.
-;; You can set the beeminder-value property to "prompt" in order to
-;; interactively specify the value whenever you complete the task.
+;; in the URL).
+;;
+;; By default, completing those tasks will log one point. You can set
+;; the beeminder-value property to "prompt" in order to interactively
+;; specify the value whenever you complete the task. Set
+;; beeminder-value to "time-today" in order to log the time you
+;; clocked today (see "Clocking work time" in the Org manual).
 
 ;;; TODO:
 
@@ -129,11 +133,16 @@ value should be the name of the property updated in Org."
   (when (and (member org-state org-done-keywords)
 						 (org-entry-get (point) (assoc-default 'slug beeminder-properties) t))
 		;; If "value" property set, use that as the data, otherwise default to 1
-		(let* ((datapoint (or (org-entry-get (point) (assoc-default 'value beeminder-properties) t) 1))
+		(let* ((datapoint (or (org-entry-get (point) (assoc-default 'value beeminder-properties) t) "1"))
 					 (title (nth 4 (org-heading-components)))
 					 (goal (org-entry-get (point) (assoc-default 'slug beeminder-properties) t)))
-			(when (and (stringp datapoint) (string= datapoint "prompt"))
+			(cond
+			 ((string= datapoint "prompt")
 				(setq datapoint (read-string "Beeminder value: ")))
+			 ((string= datapoint "time-today")
+				(org-clock-sum-today)
+				(org-back-to-heading)
+				(setq datapoint (/ (get-text-property (point) :org-clock-minutes) 60.0))))
 			;; Send to beeminder
 			(beeminder-add-data goal datapoint title)
 			(beeminder-refresh-goal))))
