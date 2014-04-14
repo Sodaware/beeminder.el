@@ -81,7 +81,6 @@ value of "1" to the "=beeminder-el=" goal.
 
 *** TODO Add a way to create goals on Beeminder from an org-mode headline
 *** TODO Add some error checking!
-*** TODO Allow tasks to use clocked time as their value
 
 ** Licence
 
