@@ -109,7 +109,8 @@
     (goalval . "beeminder-target")
     (lane . "beeminder-lane")
     (value . "beeminder-value")
-    (progress . "beeminder-progress"))
+    (progress . "beeminder-progress")
+    (updated_at . "beeminder-updated-at"))
   "Alist mapping property names for Beeminder goals.
 The key should be the symbol that the Beeminder API returns, and the
 value should be the name of the property updated in Org."
@@ -224,6 +225,8 @@ value should be the name of the property updated in Org."
 		      "   :%s: %s\n"
 		      "   :%s: %s\n"
 		      "   :%s: %s\n"
+		      "   :%s: %s\n"
+		      "   :%s: %s\n"
 		      "   :STYLE: habit\n"
 		      "   :END:\n")
 	      (assoc-default 'title goal)
@@ -240,6 +243,10 @@ value should be the name of the property updated in Org."
 	      (assoc-default 'goal_type goal)
 	      (assoc-default 'pledge beeminder-properties)
 	      (assoc-default 'pledge goal)
+	      (assoc-default 'updated_at beeminder-properties)
+	      (assoc-default 'updated_at goal)
+	      (assoc-default 'lane beeminder-properties)
+	      (assoc-default 'lane goal)
 	      (assoc-default 'goalval beeminder-properties)
 	      (assoc-default 'goalval goal)))
     (beeminder-fetch-goals beeminder-username)
