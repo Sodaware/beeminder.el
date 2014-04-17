@@ -252,6 +252,45 @@ value should be the name of the property updated in Org."
     (beeminder-fetch-goals beeminder-username)
     "\n")))
 
+(defun beeminder-submit-clocked-time ()
+  "Submits all clocked time for a goal since the last submission date.
+
+Will submit the number of minutes worked, but can also be used to
+submit hours using beeminder-unit: hours."
+
+  (interactive)
+  
+  ;; Store cursor position and get goal information
+  (let ((previous-position (point-marker))
+        (title (nth 4 (org-heading-components)))
+        (goal (org-entry-get (point) (assoc-default 'slug beeminder-properties) t))
+        (datapoint nil)
+        (last-submitted (org-entry-get (point) (assoc-default 'updated_at beeminder-properties) t)))
+    
+    ;; Get the number of minutes worked since the last submission
+    (org-clock-sum (seconds-to-time (string-to-number last-submitted)))
+    (org-back-to-heading)
+    (setq datapoint (get-text-property (point) :org-clock-minutes))
+    
+    ;; If no valid time clocked, prompt for it
+    (if (not datapoint)
+        (setq datapoint (read-from-minibuffer "Value (in minutes): ")))
+    
+    ;; Find the headline that contains the beeminder goal
+    (search-backward ":beeminder:")
+    (org-back-to-heading)
+    
+    ;; Prompt for note
+    (setq title (read-from-minibuffer "Comment: " title))
+    
+    ;; Send data to beeminder and refresh the goal
+    (beeminder-add-data goal datapoint title)
+    (beeminder-refresh-goal)
+    
+    ;; Restore the cursor to original position
+    (goto-char previous-position)))
+
+
 ;; Main API Endpoints
 
 (defun beeminder-fetch-goals (&optional username)
