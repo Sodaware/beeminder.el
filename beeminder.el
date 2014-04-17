@@ -49,12 +49,12 @@
 
 ;; You can use C-c C-x p (org-set-property) to add the beeminder
 ;; property to projects or tasks that are associated with beeminder
-;; goals. Set it to the identifier of your goal (the short name that's
+;; goals.  Set it to the identifier of your goal (the short name that's
 ;; in the URL).
 ;;
-;; By default, completing those tasks will log one point. You can set
+;; By default, completing those tasks will log one point.  You can set
 ;; the beeminder-value property to "prompt" in order to interactively
-;; specify the value whenever you complete the task. Set
+;; specify the value whenever you complete the task.  Set
 ;; beeminder-value to "time-today" in order to log the time you
 ;; clocked today (see "Clocking work time" in the Org manual).
 ;;
