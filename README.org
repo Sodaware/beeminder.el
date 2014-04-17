@@ -35,6 +35,7 @@ All Emacs installs are a little different, but the basic outline is this:
 (global-set-key "\C-cbw" 'beeminder-whoami)
 (global-set-key "\C-cbg" 'beeminder-my-goals-org)
 (global-set-key "\C-cbr" 'beeminder-refresh-goal)
+(global-set-key "\C-cbt" 'beeminder-submit-clocked-time)
 #+end_src    
 
 ** Usage
@@ -52,6 +53,9 @@ of org-mode headlines.
 =C-c b w= (=beeminder-whoami=) - Fetches your username from Beeminder. Not really useful, but good
 for checking if your authorization token is set and valid.
 
+=C-c b t= (=beeminder-submit-clocked-time=) - Submits clocked time for the
+current goal (and any of its sub-tasks). Only counts time from the "updated-at"
+value of the goal.
 
 *** Integrating with org-mode
 
