@@ -7,7 +7,8 @@
 ;; URL: http://www.philnewton.net/code/beeminder-el/
 ;; Created: March 22nd, 2014
 ;; Version: 1.0.0
-
+;; Package-Requires: ((org "7"))
+;;
 ;; This file is NOT part of GNU Emacs.
 
 ;; This is free software; you can redistribute it and/or modify it under
@@ -39,6 +40,8 @@
 
 ;; You can find your auth token by logging in to Beeminder and then visiting the
 ;; following URI: https://www.beeminder.com/api/v1/auth_token.json
+
+;; Load beeminder.el with (require 'beeminder) after your Org is set up.
 
 ;;; Keyboard bindings:
 
