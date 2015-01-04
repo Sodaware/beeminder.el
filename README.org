@@ -13,11 +13,18 @@ extension: https://gist.github.com/sachac/9700455
 
 ** Installation
 
-All Emacs installs are a little different, but the basic outline is this:
+It is recommended to install this package directly from [[http://melpa.org/][MELPA]] or via
+[[http://www.emacswiki.org/emacs/el-get][el-get]].
+
+Alternatively you can install manually.  All Emacs installs are a
+little different, but the basic outline is this:
 
   - Download the source code and put it somewhere Emacs can find it (probably
     =~/.emacs.d/=)
   - Add that directory to your =load-path= if it's not yet there: =(add-to-list 'load-path "/path/to/dir")=
+
+** Configuration
+
   - Add =(require 'beeminder)= somewhere in your =~/.emacs.d/init.el=
   - Set your API authorization token and Beeminder username configuration
     variables. You can find your token by logging into Beeminder and then visiting the following URI: https://www.beeminder.com/api/v1/auth_token.json
