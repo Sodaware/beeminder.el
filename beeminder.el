@@ -264,11 +264,11 @@ submit hours using beeminder-unit: hours."
   (interactive)
 
   ;; Store cursor position and get goal information
-  (let (previous-position (point-marker))
-    (title (nth 4 (org-heading-components)))
-    (goal (org-entry-get (point) (assoc-default 'slug beeminder-properties) t))
-    (datapoint nil)
-    (last-submitted (org-entry-get (point) (assoc-default 'updated_at beeminder-properties) t))
+  (let ((previous-position (point-marker))
+        (title (nth 4 (org-heading-components)))
+        (goal (org-entry-get (point) (assoc-default 'slug beeminder-properties) t))
+        (datapoint nil)
+        (last-submitted (org-entry-get (point) (assoc-default 'updated_at beeminder-properties) t)))
 
     ;; Get the number of minutes worked since the last submission
     (org-clock-sum (seconds-to-time (string-to-number last-submitted)))
