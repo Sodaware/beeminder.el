@@ -150,6 +150,14 @@ For example (:key value :other-key value) will generate the following string:
 
 ;; Request Helpers
 
+(defun beeminder--api-error-p (result)
+  "Check if RESULT is an api error."
+  (assoc-default 'errors result))
+
+(defun beeminder--api-valid-response-p (result)
+  "Check if RESULT is valid."
+  (not (beeminder--api-error-p result)))
+
 (defun beeminder--get (action)
   "Perform a GET request to ACTION."
   (let* ((action (if (symbolp action) (symbol-name action) action))
