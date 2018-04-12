@@ -46,11 +46,10 @@
 (defun beeminder-whoami ()
   "Display the Beeminder username for your auth token."
   (interactive)
-  ;; TODO: Display an error if not logged in.
   (let ((result (beeminder-me)))
-    (if result
+    (if (beeminder--api-valid-response-p result)
         (message "Your Beeminder username: %s" (assoc-default 'username result))
-        (warning "beeminder-auth-token is invalid or empty."))))
+        (error "Beeminder error: beeminder-auth-token is invalid or empty"))))
 
 (defun beeminder-my-goals ()
   "Display your goals in the Message buffer (kind of useless)."
@@ -61,7 +60,6 @@
                 (format "Goal: %s" (assoc-default 'title goal)))
               (beeminder-fetch-goals beeminder-username)
               "\n")))
-
 
 
 (provide 'beeminder-client)
