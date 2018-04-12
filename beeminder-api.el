@@ -132,7 +132,23 @@ the user their current pledge level."
           (beeminder--build-query query-vars)))
 
 (defun beeminder--build-query (query-vars)
-  "Build a query string using QUERY-VARS.
+  "Build a query string using QUERY-VARS and prepend it with a `?` symbol.
+
+QUERY-VARS should be a list of symbols and their corresponding values.
+
+For example (:key value :other-key value) will generate the following string:
+ ?key=value&other-key=value"
+  (if (null query-vars)
+      ""
+      (progn (let (query-string)
+               (dolist (var query-vars)
+                 (if (symbolp var)
+                     (setq query-string (concat query-string (substring (symbol-name var) 1) "="))
+                     (setq query-string (format "%s%s&" query-string var))))
+               (concat "?" (substring query-string 0 -1))))))
+
+(defun beeminder--build-post-body (query-vars)
+  "Build a post-compatible query string using QUERY-VARS.
 
 QUERY-VARS should be a list of symbols and their corresponding values.
 
@@ -145,8 +161,7 @@ For example (:key value :other-key value) will generate the following string:
                  (if (symbolp var)
                      (setq query-string (concat query-string (substring (symbol-name var) 1) "="))
                      (setq query-string (format "%s%s&" query-string var))))
-               (concat "?" (substring query-string 0 -1))))))
-
+               (substring query-string 0 -1)))))
 
 ;; Request Helpers
 
