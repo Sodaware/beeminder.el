@@ -25,23 +25,25 @@
 
 ;; Dependencies
 
-;; Interactive functions.
+;; Legacy interactive functions.
 
 (defun beeminder-add-data (goal value comment)
   "Update Beeminder GOAL with VALUE and COMMENT."
   (interactive "MGoal: \nnValue: \nMComment: \n")
   (let ((result
-         ;; Send the request
-         (beeminder-post
-          (format "users/%s/goals/%s/datapoints.json" beeminder-username goal)
-          (format "auth_token=%s&value=%s&comment=%s"
-                  beeminder-auth-token
-                  value
-                  (url-hexify-string comment)))))
-    ;; Show what happened
+         ;; Send the request.
+         (beeminder--post
+          (beeminder--create-endpoint
+           (format "users/%s/goals/%s/datapoints" beeminder-username goal))
+          (beeminder--build-post-body
+           (list :auth_token beeminder-auth-token
+                 :value      value
+                 :comment    (url-hexify-string comment))))))
+    ;; Show what happened.
     (message
      "Data added at %s"
-     (format-time-string "%Y-%m-%d %a %H:%M:%S" (seconds-to-time (assoc-default 'timestamp result))))))
+     (format-time-string "%Y-%m-%d %a %H:%M:%S"
+                         (seconds-to-time (assoc-default 'timestamp result))))))
 
 (defun beeminder-whoami ()
   "Display the Beeminder username for your auth token."
