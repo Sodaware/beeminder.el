@@ -7,6 +7,9 @@
 |_.__/  \___| \___||_| |_| |_||_||_| |_| \__,_| \___||_|   (_) \___||_|
 ```
 
+[![Melpa Status](http://melpa.org/packages/beeminder-badge.svg)](http://melpa.org/#/beeminder)
+[![Melpa Stable Status](http://stable.melpa.org/packages/beeminder-badge.svg)](http://stable.melpa.org/#/beeminder)
+
 
 A simple Emacs extension for working with [Beeminder](https://www.beeminder.com).
 
@@ -117,5 +120,5 @@ Here's an example:
 ** TODO Write documentation
 ```
 
-When "Write documentation" is changed to "DONE", `beeminder.el` will submit a
-value of "1" to the "`beeminder-el`" goal.
+When "Write documentation" is changed to "DONE", a value of "1" will be submitted to the
+"beeminder-el" goal with "Write documentation" as the comment.
