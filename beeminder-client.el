@@ -64,5 +64,13 @@
               "\n")))
 
 
+;; --------------------------------------------------
+;; -- Deprecated functions
+
+(defun beeminder-fetch-goal (username goal)
+  "Fetch data for USERNAME's GOAL."
+  (beeminder-get-user-goal username goal))
+
+
 (provide 'beeminder-client)
 ;;; beeminder-client.el ends here

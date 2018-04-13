@@ -88,9 +88,5 @@
 (defvar org-state)
 (defvar url-http-end-of-headers)
 
-(defun beeminder-fetch-goal (username goal)
-  "Fetch data for USERNAME's GOAL."
-  (beeminder-get-user-goal username goal))
-
 (provide 'beeminder)
 ;;; beeminder.el ends here
