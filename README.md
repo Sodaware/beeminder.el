@@ -86,11 +86,13 @@ Directly add data to a beeminder goal.
 Fetches all goals for the current user (set via `beeminder-username`) and
 inserts them as a list of org-mode headings.
 
-#### `beeminder-whoami`
+#### `beeminder-refresh-goal`
 
-Fetches the username associated with the current token (set via
-`beeminder-auth-token`).  Not really useful, but good for checking if your
-authorization token is set and valid.
+Fetches goal data for the current headline and updates its properties and
+deadlines.
+
+If the `beeminder-skip-deadlines` property is set to any value (such as "true"),
+the org deadline will not be updated.
 
 #### `beeminder-submit-clocked-time`
 
@@ -98,6 +100,12 @@ Submit all clocked time for the current goal (and any of its sub-tasks).  Only
 time clocked since the `updated-at` property is counted.  Submits the number of
 minutes clocked as the value.  If the goal property `beeminder-unit` is set to
 "hours", it will submit the number of hours worked instead.
+
+#### `beeminder-whoami`
+
+Fetches the username associated with the current token (set via
+`beeminder-auth-token`).  Not really useful, but good for checking if your
+authorization token is set and valid.
 
 
 ### Integrating with org-mode
