@@ -44,14 +44,14 @@
   :type '(string))
 
 (defcustom beeminder-properties
-  '((slug .       "beeminder")
-    (pledge .     "beeminder-pledge")
-    (goal_type .  "beeminder-type")
-    (goalval .    "beeminder-target")
-    (lane .       "beeminder-lane")
-    (value .      "beeminder-value")
-    (progress .   "beeminder-progress")
-    (updated_at . "beeminder-updated-at"))
+  '((slug .       "beeminder")             ;; Goal identifier.
+    (pledge .     "beeminder-pledge")      ;; Amount of money pledged.
+    (goal_type .  "beeminder-type")        ;; Type of goal.
+    (goalval .    "beeminder-target")      ;; Number the road will eventually reach.
+    (lane .       "beeminder-lane")        ;; Current lane position.
+    (curval .     "beeminder-value")       ;; Last datapoint value.
+    (progress .   "beeminder-progress")    ;; Locally calculated progress.
+    (updated_at . "beeminder-updated-at")) ;; Date of last datapoint.
   "Alist mapping property names for Beeminder goals.
 
 The key should be the symbol that the Beeminder API returns, and
