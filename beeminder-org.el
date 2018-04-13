@@ -30,19 +30,18 @@
 
 (defvar org-state)
 
-
 ;; org-mode hooks
 
-(defun beeminder-on-org-task-completed ()
+(defun beeminder--on-org-task-completed ()
   "Fires when an 'org-mode' task is marked as DONE."
   ;; Only fire if task is a beeminder-task AND is complete.
-  ;; TODO: Replace these with beeminder--org-task-p and beeminder--beeminder-task-p
+  ;; TODO: Replace these with beeminder--org-done-task-p and beeminder--beeminder-task-p
   (when (and (member org-state org-done-keywords)
              (org-entry-get (point) (assoc-default 'slug beeminder-properties) t))
     ;; If "value" property set, use that as the data, otherwise default to 1
     ;; TODO: Replace datapoint with `beeminder--task-value`
     ;; Replace the (org-entry-get (point) (assoc-default)) stuff with a helper.
-    (let* ((datapoint (or (org-entry-get (point) (assoc-default 'value beeminder-properties) t) "1"))
+    (let* ((datapoint (or (org-entry-get (point) (assoc-default 'curval beeminder-properties) t) "1"))
            (title (nth 4 (org-heading-components)))
            (goal (org-entry-get (point) (assoc-default 'slug beeminder-properties) t)))
       (cond
@@ -56,7 +55,7 @@
       (beeminder-add-data goal datapoint title)
       (beeminder-refresh-goal))))
 
-(add-hook 'org-after-todo-state-change-hook 'beeminder-on-org-task-completed)
+(add-hook 'org-after-todo-state-change-hook #'beeminder--on-org-task-completed)
 
 (defun beeminder-refresh-goal ()
   "Fetch data for the current goal headline and update it."
