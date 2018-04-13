@@ -24,13 +24,15 @@
 
 ;;; Code:
 
-;; Dependencies
-
+(require 'beeminder)
 (require 'org)
+(require 'org-clock)
 
 (defvar org-state)
 
-;; org-mode hooks
+
+;; --------------------------------------------------
+;; -- org-mode hooks
 
 (defun beeminder--on-org-task-completed ()
   "Fires when an 'org-mode' task is marked as DONE."
@@ -57,6 +59,11 @@
 
 (add-hook 'org-after-todo-state-change-hook #'beeminder--on-org-task-completed)
 
+
+;; --------------------------------------------------
+;; -- org-mode task functions
+
+;;;###autoload
 (defun beeminder-refresh-goal ()
   "Fetch data for the current goal headline and update it."
   (interactive)
@@ -96,6 +103,7 @@
                       (or (assoc-default 'losedate result)
                           (assoc-default 'goaldate result))))))))
 
+;;;###autoload
 (defun beeminder-my-goals-org ()
   "Insert your Beeminder goals as an 'org-mode' headline list."
   (interactive)
@@ -141,6 +149,7 @@
     (beeminder-fetch-goals beeminder-username)
     "\n")))
 
+;;;###autoload
 (defun beeminder-submit-clocked-time ()
   "Submits all clocked time for a goal since the last submission date.
 

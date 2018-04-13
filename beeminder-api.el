@@ -29,21 +29,23 @@
 
 ;; Dependencies
 
+(require 'beeminder)
 (require 'json)
 (require 'url-http)
 
 (defvar url-http-end-of-headers)
-(defvar beeminder-username)
-(defvar beeminder-auth-token)
 
-;; Configuration
+
+;; --------------------------------------------------
+;; -- Configuration
 
 (defconst beeminder-v1-api-endpoint
   "https://www.beeminder.com/api/v1/"
   "The endpoint for version 1.0 of the Beeminder API.")
 
 
-;; API endpoints - Users
+;; --------------------------------------------------
+;; -- API endpoints - users
 
 (defun beeminder-user-info (username)
   "Retrieve information and a list of goalnames for the user USERNAME."
@@ -56,7 +58,8 @@
   (beeminder-user-info "me"))
 
 
-;; API endpoints - Goals
+;; --------------------------------------------------
+;; -- API endpoints - goals
 
 (defun beeminder-get-user-goal (username goal)
   "Get goal details for USERNAME's GOAL."
@@ -90,7 +93,6 @@
   (beeminder--get (beeminder--create-endpoint
                    (format "users/%s/goals/%s/refresh_graph" username goal))))
 
-
 (defun beeminder-short-circuit (goal)
   "Cause a failure of GOAL.
 
@@ -99,7 +101,6 @@ the user their current pledge level."
   (beeminder--post (beeminder--create-endpoint
                     (format "users/%s/goals/%s/shortcircuit" beeminder-username goal))
                    (list :auth_token beeminder-auth-token)))
-
 
 (defun beeminder-stepdown (goal)
   "Decrease GOAL's pledge level subject to the akrasia horizon."
@@ -114,7 +115,8 @@ the user their current pledge level."
                    (list :auth_token beeminder-auth-token)))
 
 
-;; Datapoint Functions
+;; --------------------------------------------------
+;; -- API endpoints - datapoints
 
 (defun beeminder-get-datapoints (username goal)
   "Get the list of datapoints for USERNAME's GOAL."
@@ -122,8 +124,8 @@ the user their current pledge level."
                    (format "users/%s/goals/%s/datapoints" beeminder-username goal))))
 
 
-
-;; URL Helpers
+;; --------------------------------------------------
+;; -- URL helpers
 
 (defun beeminder--create-endpoint (path &optional query-vars)
   "Build an endpoint to the api using PATH and optional QUERY-VARS."
@@ -148,6 +150,10 @@ For example (:key value :other-key value) will generate the following string:
                      (setq query-string (format "%s%s&" query-string var))))
                (concat "?" (substring query-string 0 -1))))))
 
+
+;; --------------------------------------------------
+;; -- Request Helpers
+
 (defun beeminder--build-post-body (query-vars)
   "Build a post-compatible query string using QUERY-VARS.
 
@@ -164,8 +170,6 @@ For example (:key value :other-key value) will generate the following string:
                      (setq query-string (format "%s%s&" query-string var))))
                (substring query-string 0 -1)))))
 
-;; Request Helpers
-
 (defun beeminder--api-error-p (result)
   "Check if RESULT is an api error."
   (assoc-default 'errors result))
@@ -174,6 +178,7 @@ For example (:key value :other-key value) will generate the following string:
   "Check if RESULT is valid."
   (not (beeminder--api-error-p result)))
 
+;;;###autoload
 (defun beeminder--get (action)
   "Perform a GET request to ACTION."
   (let* ((action (if (symbolp action) (symbol-name action) action))

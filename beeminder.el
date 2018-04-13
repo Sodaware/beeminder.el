@@ -74,19 +74,13 @@
 
 ;;; Code:
 
-;; Dependencies
-
-(require 'json)
-(require 'org)
-(require 'url-http)
-
-(require 'beeminder-settings) ;; Settings and properties for module.
-(require 'beeminder-api)      ;; API function wrappers and helpers.
-(require 'beeminder-client)   ;; Interactive functions.
-(require 'beeminder-org)      ;; org-mode functions.
-
-(defvar org-state)
-(defvar url-http-end-of-headers)
-
+;; Package setup
 (provide 'beeminder)
+
+(cl-eval-when (load eval)
+  (require 'beeminder-settings) ;; Settings and properties for module.
+  (require 'beeminder-api)      ;; API function wrappers and helpers.
+  (require 'beeminder-client)   ;; Interactive functions.
+  (require 'beeminder-org))     ;; org-mode functions.
+
 ;;; beeminder.el ends here

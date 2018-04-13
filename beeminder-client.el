@@ -25,7 +25,11 @@
 
 ;; Dependencies
 
-;; Legacy interactive functions.
+(require 'beeminder)
+
+
+;; --------------------------------------------------
+;; -- Legacy interactive functions.
 
 (defun beeminder-add-data (goal value comment)
   "Update Beeminder GOAL with VALUE and COMMENT."
