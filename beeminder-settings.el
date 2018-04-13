@@ -51,6 +51,7 @@
     (lane .       "beeminder-lane")        ;; Current lane position.
     (curval .     "beeminder-value")       ;; Last datapoint value.
     (progress .   "beeminder-progress")    ;; Locally calculated progress.
+    (unit .       "beeminder-unit")        ;; Optional local unit ("hours").
     (updated_at . "beeminder-updated-at")) ;; Date of last datapoint.
   "Alist mapping property names for Beeminder goals.
 
