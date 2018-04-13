@@ -1,0 +1,5 @@
+* TODO This task is a beeminder task
+  DEADLINE: <2020-01-01 Wed> SCHEDULED: <2020-01-01 Wed>
+  :PROPERTIES:
+  :beeminder:   example_goal
+  :END:

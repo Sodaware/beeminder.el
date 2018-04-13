@@ -1,0 +1,20 @@
+{
+  "username": "test_user",
+  "timezone": "America/New_York",
+  "goals": [
+    "goal_1",
+    "goal_2"
+  ],
+  "updated_at": 1521648184,
+  "deadbeat": false,
+  "has_authorized_fitbit": false,
+  "default_leadtime": 3,
+  "default_alertstart": 34200,
+  "default_deadline": 0,
+  "subscription": null,
+  "subs_downto": null,
+  "subs_freq": null,
+  "subs_lifetime": null,
+  "remaining_subs_credit": 0,
+  "id": "4f71160686f224640a000016"
+}

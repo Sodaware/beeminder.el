@@ -1,0 +1,97 @@
+{
+    "slug": "example_goal",
+    "title": "Example Goal",
+    "goalval": 1234,
+    "rate": 0.001,
+    "goaldate": 1428508800,
+    "graph_url": "http://brain.beeminder.com/nonce/example+example-goal+5343f6210fdccb6274000311.png",
+    "thumb_url": "http://brain.beeminder.com/nonce/example+example-goal+5343f6210fdccb6274000311-thumb.png",
+    "goal_type": "hustler",
+    "autodata": null,
+    "losedate": 1428562799,
+    "deadline": 10800,
+    "id": "5343f6210fdccb6274000311",
+    "ephem": false,
+    "queued": false,
+    "panic": 54000,
+    "updated_at": 1420619963,
+    "burner": "frontburner",
+    "initday": 1396972800,
+    "initval": 0,
+    "curday": 1420650000,
+    "curval": 44,
+    "lastday": 1397664000,
+    "runits": "w",
+    "yaw": 1,
+    "dir": 1,
+    "exprd": false,
+    "kyoom": true,
+    "odom": false,
+    "edgy": false,
+    "noisy": false,
+    "aggday": "sum",
+    "plotall": true,
+    "steppy": true,
+    "rosy": false,
+    "movingav": false,
+    "aura": false,
+    "lane": 307535,
+    "lanewidth": 0.0001428571428571529,
+    "delta": 43.933571428571426,
+    "numpts": 4,
+    "contract": {
+        "amount": 0,
+        "stepdown_at": null
+    },
+    "frozen": false,
+    "lost": false,
+    "won": false,
+    "road": [
+        [
+            1397577600,
+            null,
+            0
+        ],
+        [
+            1397750400,
+            null,
+            0.1
+        ]
+    ],
+    "roadall": [
+        [
+            1396972800,
+            0,
+            null
+        ],
+        [
+            1397577600,
+            null,
+            0
+        ],
+        [
+            1397750400,
+            null,
+            0.1
+        ],
+        [
+            1428508800,
+            null,
+            0.001
+        ]
+    ],
+    "secret": false,
+    "pledge": 0,
+    "mathishard": [
+        1428508800,
+        0.07942857142857143,
+        0.001
+    ],
+    "headsum": "Way above the yellow brick road with 91 days of safety buffer",
+    "limsum": "-43.92 in 92 days",
+    "datapublic": false,
+    "graphsum": "44 on 2015.01.07 (4 datapoints in 275 days) targeting 0.08 on 2015.04.08 (91 more days). Yellow Brick Rd = +0.001 / week.",
+    "rah": 0.06742857142857143,
+    "delta_text": "✔ ✔ ✔",
+    "callback_url": null
+}

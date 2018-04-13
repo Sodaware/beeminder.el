@@ -1,0 +1,9 @@
+* TODO Has clocked time
+  DEADLINE: <2020-01-01 Wed> SCHEDULED: <2020-01-01 Wed>
+  :PROPERTIES:
+  :beeminder:   example_goal
+  :END:
+  
+  :LOGBOOK:
+  CLOCK: [2018-04-13 Fri 08:00]--[2018-04-13 Fri 09:00] =>  1:00
+  :END:

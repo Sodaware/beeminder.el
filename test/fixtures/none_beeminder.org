@@ -1,0 +1,6 @@
+* TODO This task is not beeminder related
+  DEADLINE: <2020-01-01 Wed> SCHEDULED: <2020-01-01 Wed>
+  :PROPERTIES:
+  :Effort:   1:00
+  :END:
+
