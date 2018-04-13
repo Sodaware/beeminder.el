@@ -179,22 +179,19 @@ For example (:key value :other-key value) will generate the following string:
   (not (beeminder--api-error-p result)))
 
 ;;;###autoload
-(defun beeminder--get (action)
-  "Perform a GET request to ACTION."
-  (let* ((action (if (symbolp action) (symbol-name action) action))
-         (url (format "%s%s" beeminder-v1-api-endpoint action)))
-    (with-current-buffer (url-retrieve-synchronously url)
-      (goto-char (point-min))
-      (goto-char url-http-end-of-headers)
-      (prog1 (json-read)
-        (kill-buffer)))))
+(defun beeminder--get (url)
+  "Perform a GET request to URL."
+  (with-current-buffer (url-retrieve-synchronously url)
+    (goto-char (point-min))
+    (goto-char url-http-end-of-headers)
+    (prog1 (json-read)
+      (kill-buffer))))
 
 ;;;###autoload
-(defun beeminder--post (action args)
-  "Perform a POST request to ACTION with ARGS."
-  (let* ((url-request-method "POST")
-         (url-request-data args)
-         (url (format "%s%s" beeminder-v1-api-endpoint action)))
+(defun beeminder--post (url args)
+  "Perform a POST request to URL with ARGS."
+  (let ((url-request-method "POST")
+        (url-request-data args))
     (with-current-buffer (url-retrieve-synchronously url)
       (goto-char (point-min))
       (goto-char url-http-end-of-headers)
