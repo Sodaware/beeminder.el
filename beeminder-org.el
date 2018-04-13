@@ -64,40 +64,18 @@
   "Fetch data for the current goal headline and update it."
   (interactive)
 
-  ;; Get the goal at current point
-  (when (org-entry-get (point) (assoc-default 'slug beeminder-properties) t)
+  ;; Get the goal at current point.
+  (when (beeminder--org-beeminder-goal-task-p)
+    (let ((goal-data (beeminder-get-user-goal
+                      beeminder-username
+                      (beeminder--org-beeminder-goal-name))))
 
-    (let* ((goal (org-entry-get (point) (assoc-default 'slug beeminder-properties) t))
-           ;; Get the updated goal from Beeminder
-           (result (beeminder-get-user-goal beeminder-username goal)))
+      ;; Update all properties and the completion percentage.
+      (beeminder--org-update-properties goal-data)
+      (beeminder--org-update-completion-percentage goal-data)
 
-      ;; Update properties
-      ;; TODO: Extract this.
-      (mapc (lambda (prop)
-              (when (assoc (car prop) result)
-                (org-entry-put (point)
-                               (cdr prop)
-                               (format "%s"
-                                       (assoc-default (car prop) result)))))
-            beeminder-properties)
-      ;; Add percentage
-      ;; TODO: Extract this.
-      (when (cdr (assoc 'goalval result))
-        (org-entry-put (point)
-                       (cdr (assoc 'progress beeminder-properties))
-                       (format "%d%%"
-                               (/ (* 100.0
-                                     (assoc-default 'curval result nil 0))
-                                  (assoc-default 'goalval result nil 0)))))
-
-      ;; Update deadline
-      ;; TODO: Extract this.
-      (org-deadline nil
-                    (format-time-string
-                     "%Y-%m-%d %a %H:%M"
-                     (seconds-to-time
-                      (or (assoc-default 'losedate result)
-                          (assoc-default 'goaldate result))))))))
+      ;; Update deadline.
+      (beeminder--org-update-deadline goal-data))))
 
 ;;;###autoload
 (defun beeminder-my-goals-org ()
@@ -195,13 +173,17 @@ submit hours using beeminder-unit: hours."
 (defun beeminder--org-done-task-p ()
   "Check if the current org node is complete.
 
-Only call this from within an org-mode hook, otherwise
+Only call this from within an `org-mode` hook, otherwise
 `org-state` will be nil."
   (member org-state org-done-keywords))
 
+(defun beeminder--org-beeminder-goal-name ()
+  "Get the goal name for the current org headline."
+  (org-entry-get (point) (beeminder--org-property-name 'slug) t))
+
 (defun beeminder--org-beeminder-goal-task-p ()
   "Check if the current org headline is tracked by Beeminder."
-  (org-entry-get (point) (assoc-default 'slug beeminder-properties) t))
+  (beeminder--org-beeminder-goal-name))
 
 (defun beeminder--org-task-value ()
   "Get value for a beeminder task headline.
@@ -209,6 +191,34 @@ Only call this from within an org-mode hook, otherwise
 If VALUE property set, use that as the data, otherwise return default value of 1."
   (or (org-entry-get (point) (assoc-default 'curval beeminder-properties) t)
       "1"))
+
+(defun beeminder--org-update-properties (goal-data)
+  "Update the current headline's properties from GOAL-DATA."
+  (mapc (lambda (prop)
+          (when (assoc (car prop) goal-data)
+            (org-entry-put (point)
+                           (cdr prop)
+                           (format "%s" (assoc-default (car prop) goal-data)))))
+        beeminder-properties))
+
+(defun beeminder--org-update-completion-percentage (goal-data)
+  "Update the current headline's completion percentage from GOAL-DATA."
+  (when (cdr (assoc 'goalval goal-data))
+    (org-entry-put (point)
+                   (cdr (assoc 'progress beeminder-properties))
+                   (format "%d%%"
+                           (/ (* 100.0
+                                 (assoc-default 'curval goal-data nil 0))
+                              (assoc-default 'goalval goal-data nil 0))))))
+
+(defun beeminder--org-update-deadline (goal-data)
+  "Update the current headline's deadline date from GOAL-DATA."
+  (org-deadline nil
+                (format-time-string
+                 "%Y-%m-%d %a %H:%M"
+                 (seconds-to-time
+                  (or (assoc-default 'losedate goal-data)
+                      (assoc-default 'goaldate goal-data))))))
 
 
 (provide 'beeminder-org)
