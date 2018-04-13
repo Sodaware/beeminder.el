@@ -61,7 +61,8 @@
 (defun beeminder-get-user-goal (username goal)
   "Get goal details for USERNAME's GOAL."
   (beeminder--get (beeminder--create-endpoint
-                   (format "users/%s/goals/%s" username goal))))
+                   (format "users/%s/goals/%s" username goal)
+                   (list :auth_token beeminder-auth-token))))
 
 (defun beeminder-get-user-goals (username)
   "Get a list of all goals for USERNAME."
