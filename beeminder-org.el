@@ -111,17 +111,17 @@
               (format-time-string
                "%Y-%m-%d %a"
                (current-time))
-              (assoc-default 'slug beeminder-properties)
+              (beeminder--org-property-name 'slug)
               (assoc-default 'slug goal)
-              (assoc-default 'goal_type beeminder-properties)
+              (beeminder--org-property-name 'goal_type)
               (assoc-default 'goal_type goal)
-              (assoc-default 'pledge beeminder-properties)
+              (beeminder--org-property-name 'pledge)
               (assoc-default 'pledge goal)
-              (assoc-default 'updated_at beeminder-properties)
+              (beeminder--org-property-name 'updated_at)
               (assoc-default 'updated_at goal)
-              (assoc-default 'lane beeminder-properties)
+              (beeminder--org-property-name 'lane)
               (assoc-default 'lane goal)
-              (assoc-default 'goalval beeminder-properties)
+              (beeminder--org-property-name 'goalval)
               (assoc-default 'goalval goal)))
     (beeminder-fetch-goals beeminder-username)
     "\n")))
@@ -138,9 +138,9 @@ submit hours using beeminder-unit: hours."
   ;; Store cursor position and get goal information.
   (let ((previous-position (point-marker))
         (title (nth 4 (org-heading-components)))
-        (goal (org-entry-get (point) (assoc-default 'slug beeminder-properties) t))
+        (goal (org-entry-get (point) (beeminder--org-property-name 'slug) t))
         (datapoint nil)
-        (last-submitted (org-entry-get (point) (assoc-default 'updated_at beeminder-properties) t)))
+        (last-submitted (org-entry-get (point) (beeminder--org-property-name 'updated_at) t)))
 
     ;; Get the number of minutes worked since the last submission.
     (org-clock-sum (seconds-to-time (string-to-number last-submitted)))
@@ -148,7 +148,7 @@ submit hours using beeminder-unit: hours."
     (setq datapoint (get-text-property (point) :org-clock-minutes))
 
     ;; If datapoint is set AND unit is hours, convert from minutes to hours.
-    (if (and datapoint (string= "hours" (org-entry-get (point) (assoc-default 'unit beeminder-properties))))
+    (if (and datapoint (string= "hours" (org-entry-get (point) (beeminder--org-property-name 'unit))))
         (setq datapoint (/ datapoint 60.0)))
 
     ;; If no valid time clocked, prompt for it.
@@ -192,7 +192,7 @@ Only call this from within an `org-mode` hook, otherwise
   "Get value for a beeminder task headline.
 
 If VALUE property set, use that as the data, otherwise return default value of 1."
-  (or (org-entry-get (point) (assoc-default 'curval beeminder-properties) t)
+  (or (org-entry-get (point) (beeminder--org-property-name 'curval) t)
       "1"))
 
 (defun beeminder--org-update-properties (goal-data)
