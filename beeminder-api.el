@@ -72,15 +72,6 @@
   (beeminder--get (beeminder--create-endpoint
                    (format "users/%s/goals" username))))
 
-(defun beeminder-create-goal (parameters)
-  "Create a Goal for the current global user with a list of PARAMETERS."
-  (let ((required-params (list :slug :title :goal_type :goaldate :goalval :rate :initval))
-        (optional-params (list :secret :datapublic :datasource :dryrun)))
-    ;; TODO: Check only required + optional parameters have been set.
-    (beeminder--post (beeminder--create-endpoint
-                      (format "users/%s/goals" beeminder-username))
-                     (list :auth_token beeminder-auth-token))))
-
 (defun beeminder-fetch-goals (&optional username)
   "Fetch a list of all goals for the global user, or USERNAME if supplied."
   (let ((user (or username beeminder-username)))
