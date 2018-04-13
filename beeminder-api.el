@@ -121,7 +121,7 @@ the user their current pledge level."
 (defun beeminder-get-datapoints (username goal)
   "Get the list of datapoints for USERNAME's GOAL."
   (beeminder--get (beeminder--create-endpoint
-                   (format "users/%s/goals/%s/datapoints" beeminder-username goal))))
+                   (format "users/%s/goals/%s/datapoints" username goal))))
 
 
 ;; --------------------------------------------------
