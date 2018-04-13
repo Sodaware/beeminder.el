@@ -133,6 +133,18 @@
       (should-not (string= (org-entry-get (point) "DEADLINE") "2020-01-01 Wed"))
       (should     (string= (org-entry-get (point) "DEADLINE") "2015-04-09 Thu 02:59"))))))
 
+(ert-deftest beeminder-org-test/refresh-goal-skips-deadline-update-if-configured ()
+  (with-org-mode-test
+   "beeminder_task.org"
+   (let ((beeminder-auth-token "ABCDEF")
+         (beeminder-username "example"))
+     (with-mock
+      (mock-get "users/example/goals/example_goal.json" "example_goal.json")
+      (org-entry-put (point) "beeminder-skip-deadlines" "skip")
+      (beeminder-refresh-goal)
+      (should     (string= (org-entry-get (point) "DEADLINE") "2020-01-01 Wed"))
+      (should-not (string= (org-entry-get (point) "DEADLINE") "2015-04-09 Thu 02:59"))))))
+
 (ert-deftest beeminder-org-test/refresh-goal-updates-all-beeminder-properties ()
   (with-org-mode-test
    "beeminder_task.org"

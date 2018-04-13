@@ -78,7 +78,8 @@
       (beeminder--org-update-completion-percentage goal-data)
 
       ;; Update deadline.
-      (beeminder--org-update-deadline goal-data))))
+      (if (beeminder--can-update-deadline-p)
+          (beeminder--org-update-deadline goal-data)))))
 
 ;;;###autoload
 (defun beeminder-my-goals-org ()
@@ -187,6 +188,10 @@ Only call this from within an `org-mode` hook, otherwise
 (defun beeminder--org-beeminder-goal-task-p ()
   "Check if the current org headline is tracked by Beeminder."
   (beeminder--org-beeminder-goal-name))
+
+(defun beeminder--can-update-deadline-p ()
+  "Check if the current org headline supports deadline updating."
+  (not (org-entry-get (point) (beeminder--org-property-name 'skip_deadlines))))
 
 (defun beeminder--org-task-value ()
   "Get value for a beeminder task headline.
