@@ -150,44 +150,44 @@ submit hours using beeminder-unit: hours."
 
   (interactive)
 
-  ;; Store cursor position and get goal information
-  (let (previous-position (point-marker))
-    (title (nth 4 (org-heading-components)))
-    (goal (org-entry-get (point) (assoc-default 'slug beeminder-properties) t))
-    (datapoint nil)
-    (last-submitted (org-entry-get (point) (assoc-default 'updated_at beeminder-properties) t))
+  ;; Store cursor position and get goal information.
+  (let ((previous-position (point-marker))
+        (title (nth 4 (org-heading-components)))
+        (goal (org-entry-get (point) (assoc-default 'slug beeminder-properties) t))
+        (datapoint nil)
+        (last-submitted (org-entry-get (point) (assoc-default 'updated_at beeminder-properties) t)))
 
-    ;; Get the number of minutes worked since the last submission
+    ;; Get the number of minutes worked since the last submission.
     (org-clock-sum (seconds-to-time (string-to-number last-submitted)))
     (org-back-to-heading)
     (setq datapoint (get-text-property (point) :org-clock-minutes))
 
-    ;; If no valid time clocked, prompt for it
     ;; If datapoint is set AND unit is hours, convert from minutes to hours.
     (if (and datapoint (string= "hours" (org-entry-get (point) (assoc-default 'unit beeminder-properties))))
         (setq datapoint (/ datapoint 60.0)))
 
+    ;; If no valid time clocked, prompt for it.
     (if (not datapoint)
-        (setq datapoint (read-from-minibuffer "Value (in minutes): ")))
+        (setq datapoint (read-from-minibuffer "Value (in minutes): " "")))
 
-    ;; Find the headline that contains the beeminder goal
-    (search-backward ":beeminder:")
+    ;; Find the headline that contains the beeminder goal.
+    (search-backward ":beeminder:" nil t)
     (org-back-to-heading)
 
     ;; Prompt for note
     (setq title (read-from-minibuffer "Comment: " title))
 
-    ;; Send data to beeminder and refresh the goal
+    ;; Send data to beeminder and refresh the goal.
     (beeminder-add-data goal datapoint title)
     (beeminder-refresh-goal)
 
-    ;; Restore the cursor to original position
+    ;; Restore the cursor to original position.
     (goto-char previous-position)))
 
 ;; Helper Functions
 
-(defun beeminder--org-task-p ()
-  "Check if the current org node is a valid task."
+(defun beeminder--org-done-task-p ()
+  "Check if the current org node is complete."
   (member org-state org-done-keywords))
 
 (defun beeminder--beeminder-task-p ()
