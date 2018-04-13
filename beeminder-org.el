@@ -37,15 +37,11 @@
 (defun beeminder--on-org-task-completed ()
   "Fires when an 'org-mode' task is marked as DONE."
   ;; Only fire if task is a beeminder-task AND is complete.
-  ;; TODO: Replace these with beeminder--org-done-task-p and beeminder--beeminder-task-p
-  (when (and (member org-state org-done-keywords)
-             (org-entry-get (point) (assoc-default 'slug beeminder-properties) t))
-    ;; If "value" property set, use that as the data, otherwise default to 1
-    ;; TODO: Replace datapoint with `beeminder--task-value`
-    ;; Replace the (org-entry-get (point) (assoc-default)) stuff with a helper.
-    (let* ((datapoint (or (org-entry-get (point) (assoc-default 'curval beeminder-properties) t) "1"))
-           (title (nth 4 (org-heading-components)))
-           (goal (org-entry-get (point) (assoc-default 'slug beeminder-properties) t)))
+  (when (and (beeminder--org-done-task-p)
+             (beeminder--org-beeminder-goal-task-p))
+    (let ((datapoint (beeminder--org-task-value))
+          (title (nth 4 (org-heading-components)))
+          (goal (org-entry-get (point) (beeminder--org-property-name 'slug) t)))
       (cond
        ((string= datapoint "prompt")
         (setq datapoint (read-string "Beeminder value: ")))
@@ -192,21 +188,26 @@ submit hours using beeminder-unit: hours."
     ;; Restore the cursor to original position.
     (goto-char previous-position)))
 
-;; Helper Functions
+
+;; --------------------------------------------------
+;; -- org-mode helper functions
 
 (defun beeminder--org-done-task-p ()
-  "Check if the current org node is complete."
+  "Check if the current org node is complete.
+
+Only call this from within an org-mode hook, otherwise
+`org-state` will be nil."
   (member org-state org-done-keywords))
 
-(defun beeminder--beeminder-task-p ()
-  "Check if the current org node is tracked by Beeminder."
+(defun beeminder--org-beeminder-goal-task-p ()
+  "Check if the current org headline is tracked by Beeminder."
   (org-entry-get (point) (assoc-default 'slug beeminder-properties) t))
 
-(defun beeminder--task-value ()
+(defun beeminder--org-task-value ()
   "Get value for a beeminder task headline.
 
 If VALUE property set, use that as the data, otherwise return default value of 1."
-  (or (org-entry-get (point) (assoc-default 'value beeminder-properties) t)
+  (or (org-entry-get (point) (assoc-default 'curval beeminder-properties) t)
       "1"))
 
 
