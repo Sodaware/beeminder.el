@@ -67,7 +67,7 @@
 
     (let* ((goal (org-entry-get (point) (assoc-default 'slug beeminder-properties) t))
            ;; Get the updated goal from Beeminder
-           (result (beeminder-fetch-goal beeminder-username goal)))
+           (result (beeminder-get-user-goal beeminder-username goal)))
 
       ;; Update properties
       ;; TODO: Extract this.
