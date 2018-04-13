@@ -63,6 +63,10 @@ the value should be the name of the property updated in Org."
            (symbol "Symbol")
            (string "Property name"))))
 
+(defun beeminder--org-property-name (symbol)
+  "Get beeminder property name for SYMBOL."
+  (assoc-default symbol beeminder-properties))
+
 
 (provide 'beeminder-settings)
 ;;; beeminder-settings.el ends here
