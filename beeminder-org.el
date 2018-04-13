@@ -1,4 +1,4 @@
-;;; beeminder-org.el --- org-mode integration for Beeminder
+;;; beeminder-org.el --- org-mode integration for Beeminder -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2014 Phil Newton <phil@sodaware.net>
 

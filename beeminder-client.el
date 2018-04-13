@@ -1,4 +1,4 @@
-;;; beeminder-client.el --- Emacs client interface for Beeminder.
+;;; beeminder-client.el --- Emacs client interface for Beeminder. -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2014-2016 Phil Newton
 

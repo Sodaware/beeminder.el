@@ -1,4 +1,4 @@
-;;; beeminder-api.el --- API Wrapper functions for Beeminder
+;;; beeminder-api.el --- API Wrapper functions for Beeminder -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2014-2016 Phil Newton
 

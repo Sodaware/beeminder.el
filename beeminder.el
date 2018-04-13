@@ -1,4 +1,4 @@
-;;; beeminder.el --- Emacs interface for Beeminder
+;;; beeminder.el --- Emacs interface for Beeminder -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2014 Phil Newton <phil@sodaware.net>
 
