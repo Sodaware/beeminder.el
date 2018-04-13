@@ -70,6 +70,23 @@
       (org-entry-put (point) "beeminder-value" "time-today")
       (beeminder--on-org-task-completed)))))
 
+(ert-deftest beeminder-org-test/on-task-completed-sets-datapoint-to-time-worked-in-minutes-if-configured ()
+  (with-org-mode-test
+   "beeminder_task.org"
+   (let ((beeminder-auth-token "ABCDEF")
+         (beeminder-username   "example")
+         (org-state            "DONE"))
+     (with-mock
+      ;; Stub a bunch of org features as we only want to know if the value got set.
+      (stub org-clock-sum-today)
+      (stub org-back-to-heading)
+      (mock (get-text-property 1 :org-clock-minutes) => 120)
+      (mock (beeminder-add-data "example_goal" 120 "This task is a beeminder task"))
+      (stub beeminder-refresh-goal)
+      (org-entry-put (point) "beeminder-value" "time-today")
+      (org-entry-put (point) "beeminder-unit"  "minutes")
+      (beeminder--on-org-task-completed)))))
+
 ;; - It prompts for a datapoint if value == `prompt`
 (ert-deftest beeminder-org-test/on-task-completed-promptsfor-datapoint-if-configured ()
   (with-org-mode-test
@@ -285,7 +302,6 @@
       (org-entry-put (point) "beeminder-updated-at" "1")
       (beeminder-submit-clocked-time)))))
 
-
 ;; It reads the comment from the mini-buffer
 (ert-deftest beeminder-org-test/submit-clocked-time-prompts-for-comment ()
   (with-org-mode-test
@@ -299,19 +315,6 @@
 
       (org-entry-put (point) "beeminder-updated-at" "1")
       (beeminder-submit-clocked-time)))))
-
-
-
-;; --------------------------------------------------
-;; -- beeminder--org-task-p
-
-;; --------------------------------------------------
-;; -- beeminder--beeminder-task-p
-
-;; --------------------------------------------------
-;; -- beeminder--task-value
-
-
 
 
 ;;; beeminder-org-test.el ends here

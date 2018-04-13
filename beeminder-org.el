@@ -48,8 +48,11 @@
        ((string= datapoint "time-today")
         (org-clock-sum-today)
         (org-back-to-heading)
-        (setq datapoint (/ (get-text-property (point) :org-clock-minutes) 60.0))))
-      ;; Send to beeminder
+        (setq datapoint (get-text-property (point) :org-clock-minutes))
+        (unless (string= "minutes" (org-entry-get (point) (beeminder--org-property-name 'unit)))
+          (setq datapoint (/ datapoint 60.0)))))
+
+      ;; Send to beeminder.
       (beeminder-add-data goal datapoint title)
       (beeminder-refresh-goal))))
 
