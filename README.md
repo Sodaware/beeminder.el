@@ -77,20 +77,28 @@ current goal (and any of its sub-tasks).
 
 ### Interactive functions
 
-`beeminder-add-data` -- Directly add data to a beeminder goal.
+#### `beeminder-add-data`
 
-`beeminder-my-goals-org` -- Fetches all goals for the current user (set via
-`beeminder-username`) and inserts them as a list of org-mode headings.
+Directly add data to a beeminder goal.
 
-`beeminder-whoami` -- Fetches the username associated with the current token
-(set via `beeminder-auth-token`).  Not really useful, but good for checking if
-your authorization token is set and valid.
+#### `beeminder-my-goals-org`
 
-`beeminder-submit-clocked-time` -- Submit all clocked time for the current goal
-(and any of its sub-tasks).  Only time clocked since the `updated-at` property
-is counted.  Submits the number of minutes clocked as the value.  If the
-goal property `beeminder-unit` is set to "hours", it will submit the number of
-hours worked instead.
+Fetches all goals for the current user (set via `beeminder-username`) and
+inserts them as a list of org-mode headings.
+
+#### `beeminder-whoami`
+
+Fetches the username associated with the current token (set via
+`beeminder-auth-token`).  Not really useful, but good for checking if your
+authorization token is set and valid.
+
+#### `beeminder-submit-clocked-time`
+
+Submit all clocked time for the current goal (and any of its sub-tasks).  Only
+time clocked since the `updated-at` property is counted.  Submits the number of
+minutes clocked as the value.  If the goal property `beeminder-unit` is set to
+"hours", it will submit the number of hours worked instead.
+
 
 ### Integrating with org-mode
 
