@@ -28,6 +28,104 @@
 (require 'beeminder)
 
 
+;; TODO: Maybe split this into another file?
+
+;; --------------------------------------------------
+;; -- Goal list
+
+;; TODO: Fetch goals for new buffer.
+;; TODO: DRY up this function
+(defun beeminder-goals ()
+  "Display an interactive list of your current goals."
+  (interactive)
+  ;; Get the buffer for the current user and return it.  If no buffer found,
+  ;; create and switch to it.
+  (let ((buffer (get-buffer (beeminder-goals--buffer-name))))
+    (if buffer
+        (switch-to-buffer buffer)
+        (with-current-buffer (generate-new-buffer (beeminder-goals--buffer-name))
+          (beeminder--initialize-goals-buffer)
+          (beeminder-goals-mode)
+          (switch-to-buffer (get-buffer (beeminder-goals--buffer-name)))))))
+
+(defun beeminder-goals-mode ()
+  "Major mode for viewing the Beeminder goals list."
+  (interactive)
+  (setq major-mode 'beeminder-goals-mode
+        mode-name "beeminder-goals"))
+
+(define-derived-mode beeminder-mode special-mode "Beeminder"
+  "Base mode which other Beeminder modes inherit."
+  :group 'beeminder-modes
+  (buffer-disable-undo)
+  (setq buffer-read-only t
+        truncate-lines t
+        show-trailing-whitespace nil))
+
+(define-derived-mode beeminder-goals-mode beeminder-mode "Beeminder Goals"
+  "Mode for browsing a list of beeminder goals."
+  ;; KEYMAP:
+  ;; g       -- refresh buffer
+  ;; <tab>   -- Open the current goal
+  ;; <enter> -- 
+  )
+
+(defun beeminder--initialize-goals-buffer ()
+  "Initialize the goals buffer.
+
+Fetches goal data from Beeminder and creates the initial content
+for the beeminder-goals buffer."
+  (insert (format "Beeminder goals for %s\n\n" beeminder-username))
+  (beeminder--insert-active-goals)
+  (beeminder--insert-archived-goals)
+  (beeminder--insert-recent-datapoints))
+
+(defun beeminder--insert-active-goals ()
+  "Insert active goals into buffer."
+  ;; (beeminder-get-user-goals beeminder-username)
+  (let ((goals nil))
+    (insert (format "Active Goals (%d)\n\n" (length goals)))
+    (if goals
+        (progn
+          (insert "     Goal                 Deadline              Deadline Date      Pledge\n")
+          (dolist (goal goals)
+            (insert (beeminder--goal-status-indicator goal))
+            (insert "     ")                     ;; Status
+            (insert (assoc-default 'title goal)) ;; Name
+            (insert "+5.00 due in 8 days")))
+        (insert "No active goals\n\n"))))
+
+(defun beeminder--insert-archived-goals ()
+  "Insert archived goals into buffer."
+  ;; (beeminder-get-user-goals beeminder-username)
+  (let ((goals nil))
+    (insert (format "Archived Goals (%d)\n\n" (length goals)))
+    (if goals
+        (progn
+          (insert "     Goal                 Deadline              Deadline Date      Pledge\n")
+          
+          (dolist (goal goals)
+            (insert "     ")                     ;; Status
+            (insert (assoc-default 'title goal)) ;; Name
+            (insert "+5.00 due in 8 days")))
+        (insert "No archived goals\n\n"))))
+
+(defun beeminder--insert-recent-datapoints ()
+  "Insert the last 10 datapoints across all goals into the buffer."
+  ;; (beeminder-get-user-goals beeminder-username)
+  (let ((datapoints nil))
+    (insert (format "Recent Datapoints (%d)\n\n" (length datapoints)))
+    ))
+
+(defun beeminder--goal-status-indicator (goal)
+  "Generate indicator for GOAL."
+  "    ")
+
+(defun beeminder-goals--buffer-name ()
+  "Get the name of the Beeminder goals buffer."
+  (format "beeminder: %s" beeminder-username))
+
+
 ;; --------------------------------------------------
 ;; -- Legacy interactive functions.
 
