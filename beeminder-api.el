@@ -91,19 +91,22 @@ ATTENTION: This will increase the pledge level of GOAL and charge
 the user their current pledge level."
   (beeminder--post (beeminder--create-endpoint
                     (format "users/%s/goals/%s/shortcircuit" beeminder-username goal))
-                   (list :auth_token beeminder-auth-token)))
+                   (beeminder--build-post-body
+                    (list :auth_token beeminder-auth-token))))
 
 (defun beeminder-stepdown (goal)
   "Decrease GOAL's pledge level subject to the akrasia horizon."
   (beeminder--post (beeminder--create-endpoint
                     (format "users/%s/goals/%s/stepdown" beeminder-username goal))
-                   (list :auth_token beeminder-auth-token)))
+                   (beeminder--build-post-body
+                    (list :auth_token beeminder-auth-token))))
 
 (defun beeminder-cancel-stepdown (goal)
   "Cancel a pending stepdown of GOAL's pledge."
   (beeminder--post (beeminder--create-endpoint
                     (format "users/%s/goals/%s/cancel_stepdown" beeminder-username goal))
-                   (list :auth_token beeminder-auth-token)))
+                   (beeminder--build-post-body
+                    (list :auth_token beeminder-auth-token))))
 
 
 ;; --------------------------------------------------
