@@ -1,6 +1,6 @@
 ;;; beeminder-api.el --- API Wrapper functions for Beeminder -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2014-2016 Phil Newton
+;; Copyright (C) 2014-2019 Phil Newton
 
 ;; Author: Phil Newton <phil@sodaware.net>
 
@@ -70,7 +70,8 @@
 (defun beeminder-get-user-goals (username)
   "Get a list of all goals for USERNAME."
   (beeminder--get (beeminder--create-endpoint
-                   (format "users/%s/goals" username))))
+                   (format "users/%s/goals" username)
+                   (list :auth_token beeminder-auth-token))))
 
 (defun beeminder-fetch-goals (&optional username)
   "Fetch a list of all goals for the global user, or USERNAME if supplied."
@@ -116,6 +117,43 @@ the user their current pledge level."
   "Get the list of datapoints for USERNAME's GOAL."
   (beeminder--get (beeminder--create-endpoint
                    (format "users/%s/goals/%s/datapoints" username goal))))
+
+
+;; --------------------------------------------------
+;; -- Goal helpers
+
+(defun beeminder--goal-derailed-p (goal)
+  "Check if GOAL is derailed."
+  (assoc-default 'lost goal))
+
+(defun beeminder--goal-in-red-p (goal)
+  "Check if GOAL is in the red."
+  (eq :red (beeminder--goal-dot-color goal)))
+
+(defun beeminder--goal-in-orange-p (goal)
+  "Check if GOAL is in the orange."
+  (eq :orange (beeminder--goal-dot-color goal)))
+
+(defun beeminder--goal-fresh-p (goal)
+  "Get the fresh indicator for GOAL.
+
+GOAL is fresh if it had data submitted today."
+  (beeminder--goal-data-added-after-p goal (parse-time-string (format-time-string "%F 00:00:00"))))
+
+(defun beeminder--goal-dot-color (goal)
+  "Get the dot color for GOAL."
+  (let ((color (* (assoc-default 'yaw goal) (assoc-default 'lane goal))))
+    (cond ((>  color  1) :green)
+          ((=  color  1) :blue)
+          ((=  color -1) :orange)
+          ((<= color -2) :red))))
+
+(defun beeminder--goal-data-added-after-p (goal timestamp)
+  "Test if GOAL's last datapoint was entered after TIMESTAMP."
+  (let ((goal-timestamp (format-time-string "%s" (seconds-to-time (assoc-default 'lastday goal))))
+        (test-timestamp (format-time-string "%s" (apply 'encode-time timestamp))))
+    (> (string-to-number goal-timestamp)
+       (string-to-number test-timestamp))))
 
 
 ;; --------------------------------------------------
