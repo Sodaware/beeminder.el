@@ -8,6 +8,19 @@
 
 
 ;; --------------------------------------------------
+;; -- beeminder-goals
+
+(ert-deftest beeminder-client-test/beeminder-goals-creates-new-buffer-if-doesnt-exist ()
+  (with-mock
+   (stub beeminder--initialize-goals-buffer)
+   (stub beeminder-goals-mode)
+   (let ((beeminder-username "test_user"))
+     (should-not (get-buffer "beeminder: test_user"))
+     (beeminder-goals)
+     (should (get-buffer "beeminder: test_user")))))
+
+
+;; --------------------------------------------------
 ;; -- beeminder--initialize-goals-buffer
 
 (ert-deftest beeminder-client-test/initialize-goals-buffer-inserts-headlines ()
@@ -16,10 +29,10 @@
    (with-temp-buffer
      (let ((beeminder-username "test_user"))
        (beeminder--initialize-goals-buffer)
-       (should (string= "Beeminder goals for test_user" (buffer-line-contents 1)))
-       (should (string= "Active Goals (0)" (buffer-line-contents 3)))
-       (should (string= "Archived Goals (0)" (buffer-line-contents 7)))
-       (should (string= "Recent Datapoints (0)" (buffer-line-contents 11)))))))
+       (should (string= "Beeminder goals for: test_user" (buffer-line-contents 1)))
+       (should (string= "Active Goals (1)" (buffer-line-contents 4)))
+       (should (string= "Archived Goals (0)" (buffer-line-contents 8)))
+       (should (string= "Recent Datapoints" (buffer-line-contents 10)))))))
 
 
 ;; --------------------------------------------------

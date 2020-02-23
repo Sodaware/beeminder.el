@@ -1,6 +1,6 @@
-;;; beeminder-client.el --- Emacs client interface for Beeminder. -*- lexical-binding: t; -*-
+;;; beeminder-client.el --- Interactive interface for Beeminder. -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2014-2016 Phil Newton
+;; Copyright (C) 2014-2019 Phil Newton
 
 ;; Author: Phil Newton <phil@sodaware.net>
 
@@ -19,7 +19,7 @@
 
 ;;; Commentary:
 
-;; This file contains a simple Beeminder client.
+;; This file contains interactive functions for working with Beeminder.
 
 ;;; Code:
 
@@ -48,6 +48,7 @@
           (beeminder-goals-mode)
           (switch-to-buffer (get-buffer (beeminder-goals--buffer-name)))))))
 
+;; TODO: Trash this? Or fix it.
 (defun beeminder-goals-mode ()
   "Major mode for viewing the Beeminder goals list."
   (interactive)
@@ -67,7 +68,7 @@
   ;; KEYMAP:
   ;; g       -- refresh buffer
   ;; <tab>   -- Open the current goal
-  ;; <enter> -- 
+  ;; <enter> --
   )
 
 (defun beeminder--initialize-goals-buffer ()
@@ -75,55 +76,133 @@
 
 Fetches goal data from Beeminder and creates the initial content
 for the beeminder-goals buffer."
-  (insert (format "Beeminder goals for %s\n\n" beeminder-username))
+  (insert (format "Beeminder goals for: %s\n"   beeminder-username))
+  (insert (format "Data fetched at    : %s\n\n" (format-time-string "%a %H:%M:%S" (current-time))))
   (beeminder--insert-active-goals)
+  (insert "\n")
   (beeminder--insert-archived-goals)
+  (insert "\n")
   (beeminder--insert-recent-datapoints))
 
 (defun beeminder--insert-active-goals ()
   "Insert active goals into buffer."
   ;; (beeminder-get-user-goals beeminder-username)
-  (let ((goals nil))
-    (insert (format "Active Goals (%d)\n\n" (length goals)))
+  (let ((goals (beeminder--test-goals)))
+    (insert (format "Active Goals (%d)\n" (length goals)))
     (if goals
-        (progn
-          (insert "     Goal                 Deadline              Deadline Date      Pledge\n")
-          (dolist (goal goals)
-            (insert (beeminder--goal-status-indicator goal))
-            (insert "     ")                     ;; Status
-            (insert (assoc-default 'title goal)) ;; Name
-            (insert "+5.00 due in 8 days")))
-        (insert "No active goals\n\n"))))
+        (beeminder--insert-goal-table goals)
+        (insert "No active goals"))))
 
 (defun beeminder--insert-archived-goals ()
   "Insert archived goals into buffer."
   ;; (beeminder-get-user-goals beeminder-username)
   (let ((goals nil))
-    (insert (format "Archived Goals (%d)\n\n" (length goals)))
+    (insert (format "Archived Goals (%d)\n" (length goals)))
     (if goals
         (progn
           (insert "     Goal                 Deadline              Deadline Date      Pledge\n")
-          
           (dolist (goal goals)
             (insert "     ")                     ;; Status
             (insert (assoc-default 'title goal)) ;; Name
             (insert "+5.00 due in 8 days")))
-        (insert "No archived goals\n\n"))))
+        (insert "No archived goals"))))
 
 (defun beeminder--insert-recent-datapoints ()
   "Insert the last 10 datapoints across all goals into the buffer."
   ;; (beeminder-get-user-goals beeminder-username)
-  (let ((datapoints nil))
-    (insert (format "Recent Datapoints (%d)\n\n" (length datapoints)))
-    ))
+  (let ((datapoints (beeminder--test-datapoints)))
+    (insert "Recent Datapoints\n")
+    (if datapoints
+        (beeminder--insert-datapoints-table datapoints)
+        (insert "No recent datapoints"))))
 
 (defun beeminder--goal-status-indicator (goal)
   "Generate indicator for GOAL."
-  "    ")
+  (format "%s%s"
+          (beeminder--goal-indicator-rail  goal)
+          (beeminder--goal-indicator-fresh goal)))
+
+(defun beeminder--goal-indicator-rail (goal)
+  "Get derailed or nearly-derailed status for GOAL."
+  (cond
+   ((beeminder--goal-derailed-p  goal) "!!!")
+   ((beeminder--goal-in-red-p    goal) " !!")
+   ((beeminder--goal-in-orange-p goal) "  !")
+   (t                                  "   ")))
+
+(defun beeminder--goal-indicator-fresh (goal)
+  "Get the fresh indicator for GOAL.
+
+GOAL is fresh if it had data submitted today."
+  (if (beeminder--goal-fresh-p goal)
+      "✓"
+      " "))
 
 (defun beeminder-goals--buffer-name ()
   "Get the name of the Beeminder goals buffer."
   (format "beeminder: %s" beeminder-username))
+
+(defun beeminder--insert-goal-table (goals)
+  "Generate text for a table of GOALS.
+
+GOALS must contain valid goal data."
+  ;; Insert the header.
+  (insert "     Goal                   Deadline               Pledge        Derails At\n")
+
+  ;; Insert each goal.
+  (dolist (goal goals)
+    (insert (format "%4s "   (beeminder--goal-status-indicator goal)))
+    (insert (format "%-22s " (assoc-default 'title goal)))
+    (insert (format "%-22s " (assoc-default 'limsumdays goal)))
+    (insert (format "%6s  "  (assoc-default 'amount (assoc-default 'contract goal))))
+    (insert (format "%11s"   (format-time-string "%Y-%m-%d %H:%M"(assoc-default 'goaldate goal))))
+    (insert "\n")))
+
+(defun beeminder--insert-datapoints-table (datapoints)
+  "Insert a table for DATAPOINTS."
+  ;; Insert the header.
+  (insert "Date       Goal  Value  Comment  Date Entered\n")
+
+  ;; Insert each datapoint.
+  (dolist (datapoint datapoints)
+    (insert (format "%10s "  (assoc-default 'daystamp datapoint)))
+    (insert (format "%-22s " (assoc-default 'requestid datapoint)))
+    (insert (format "%-22s " (assoc-default 'value datapoint)))
+    (insert (format "%6s  "  (assoc-default 'comment datapoint)))
+    (insert (format "%11s"   (format-time-string "%Y-%m-%d %H:%M" (assoc-default 'timestamp datapoint))))
+    (insert "\n")))
+
+(defun beeminder--test-goals ()
+  "TEST GOALS REMOVE THIS."
+  '(((title . "something")
+     (limsum . "+13 in 2 days")
+     (limsumdays . "+13 due in 2 days")
+     (baremin . "+13")
+     (roadstatuscolor . "blue")
+     (timestamp  . 1562342400)
+     (lastday . 1562342400)
+     (goaldate . 1562342400)
+     (yaw . -1)
+     (lane . 1)
+     (lost . nil)
+     (contract . ((amount . 30.0))))))
+
+(defun beeminder--test-datapoints ()
+  "TEST DATAPOINTS REMOVE THIS."
+  '(((id         . "1")
+     (timestamp  . 1562342400)
+     (daystamp   . "20191010")
+     (value      . "12")
+     (comment    . "Example datapoint")
+     (updated_at . 123)
+     (requestid . "a"))
+    ((id         . "2")
+     (timestamp  . 1562342410)
+     (daystamp   . "20191011")
+     (value      . "15")
+     (comment    . "Another example datapoint")
+     (updated_at . 123)
+     (requestid . "b"))))
 
 
 ;; --------------------------------------------------
