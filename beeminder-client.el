@@ -80,9 +80,7 @@ for the beeminder-goals buffer."
   (insert (format "Data fetched at    : %s\n\n" (format-time-string "%a %H:%M:%S" (current-time))))
   (beeminder--insert-active-goals)
   (insert "\n")
-  (beeminder--insert-archived-goals)
-  (insert "\n")
-  (beeminder--insert-recent-datapoints))
+  (beeminder--insert-archived-goals))
 
 (defun beeminder--insert-active-goals ()
   "Insert active goals into buffer."
@@ -106,15 +104,6 @@ for the beeminder-goals buffer."
             (insert (assoc-default 'title goal)) ;; Name
             (insert "+5.00 due in 8 days")))
         (insert "No archived goals"))))
-
-(defun beeminder--insert-recent-datapoints ()
-  "Insert the last 10 datapoints across all goals into the buffer."
-  ;; (beeminder-get-user-goals beeminder-username)
-  (let ((datapoints (beeminder--test-datapoints)))
-    (insert "Recent Datapoints\n")
-    (if datapoints
-        (beeminder--insert-datapoints-table datapoints)
-        (insert "No recent datapoints"))))
 
 (defun beeminder--goal-status-indicator (goal)
   "Generate indicator for GOAL."
