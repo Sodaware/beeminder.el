@@ -30,15 +30,12 @@
      (let ((beeminder-username "test_user"))
        (beeminder--initialize-goals-buffer)
        (should (string= "Beeminder goals for: test_user" (buffer-line-contents 1)))
-       (should (string= "Active Goals (1)" (buffer-line-contents 4)))
-       (should (string= "Archived Goals (0)" (buffer-line-contents 8)))
-       (should (string= "Recent Datapoints" (buffer-line-contents 10)))))))
+       (should (string= "Active Goals (2)" (buffer-line-contents 4)))
+       (should (string= "Archived Goals (0)" (buffer-line-contents 9)))))))
 
 
 ;; --------------------------------------------------
 ;; -- beeminder--goal-status-indicator
-
-
 
 ;; Returns 4 spaces for goals that are on target and have no data today.
 (ert-deftest beeminder-client-test/goal-status-empty-by-default ()

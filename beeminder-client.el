@@ -127,6 +127,15 @@ GOAL is fresh if it had data submitted today."
       "✓"
       " "))
 
+(defun beeminder--goal-deadline-indicator (goal)
+  "Get deadline text for GOAL.
+
+Will return the deadline date for valid goals, or 'DERAILED' for
+goals that are derailed."
+  (if (beeminder--goal-derailed-p goal)
+      "DERAILED"
+      (assoc-default 'limsumdays goal)))
+
 (defun beeminder-goals--buffer-name ()
   "Get the name of the Beeminder goals buffer."
   (format "beeminder: %s" beeminder-username))
@@ -142,9 +151,9 @@ GOALS must contain valid goal data."
   (dolist (goal goals)
     (insert (format "%4s "   (beeminder--goal-status-indicator goal)))
     (insert (format "%-22s " (assoc-default 'title goal)))
-    (insert (format "%-22s " (assoc-default 'limsumdays goal)))
+    (insert (format "%-22s " (beeminder--goal-deadline-indicator goal)))
     (insert (format "%6s  "  (assoc-default 'amount (assoc-default 'contract goal))))
-    (insert (format "%11s"   (format-time-string "%Y-%m-%d %H:%M"(assoc-default 'goaldate goal))))
+    (insert (format "%11s"   (format-time-string "%Y-%m-%d %H:%M" (assoc-default 'goaldate goal))))
     (insert "\n")))
 
 (defun beeminder--insert-datapoints-table (datapoints)
@@ -174,6 +183,18 @@ GOALS must contain valid goal data."
      (yaw . -1)
      (lane . 1)
      (lost . nil)
+     (contract . ((amount . 30.0))))
+    ((title . "something else")
+     (limsum . "+15 in 2 days")
+     (limsumdays . "+13 due in 2 days")
+     (baremin . "+10")
+     (roadstatuscolor . "red")
+     (timestamp  . 1562342400)
+     (lastday . 1562342400)
+     (goaldate . 1562342400)
+     (yaw . -1)
+     (lane . 1)
+     (lost . 1)
      (contract . ((amount . 30.0))))))
 
 (defun beeminder--test-datapoints ()
