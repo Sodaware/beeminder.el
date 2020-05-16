@@ -96,5 +96,35 @@
     "graphsum": "44 on 2015.01.07 (4 datapoints in 275 days) targeting 0.08 on 2015.04.08 (91 more days). Yellow Brick Rd = +0.001 / week.",
     "rah": 0.06742857142857143,
     "delta_text": "✔ ✔ ✔",
-    "callback_url": null
+    "callback_url": null,
+    "recent_data": [
+        {
+            "id": {
+                "$oid": "__UNIQUE_ID_1__"
+            },
+            "fulltext": "2020-May-08 entered at 17:07 via Zapier Beta",
+            "canonical": "08 1 \"First example data point\"",
+            "origin": "Zapier Beta",
+            "urtext": null,
+            "measured_at": "2020-05-08T21:07:54.000Z",
+            "created_at": "2020-05-08T21:07:54.000Z",
+            "comment": "First example data point",
+            "value": 1.0,
+            "daystamp": "20200508"
+        },
+        {
+            "id": {
+                "$oid": "__UNIQUE_ID_2__"
+            },
+            "fulltext": "2020-May-05 entered at 19:59 via api",
+            "canonical": "05 0.5 \"Second example data point\"",
+            "origin": "api",
+            "urtext": null,
+            "measured_at": "2020-05-05T23:59:19.000Z",
+            "created_at": "2020-05-05T23:59:19.000Z",
+            "comment": "Second example data point",
+            "value": 0.5,
+            "daystamp": "20200505"
+        }
+    ]
 }

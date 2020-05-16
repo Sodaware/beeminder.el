@@ -156,9 +156,28 @@
   (insert "\n"))
 
 (defun beeminder--insert-goal-recent-data-section (goal)
-  "Insert the 'Goal progress' section for GOAL."
+  "Insert recent datapoints for GOAL."
   (insert "Recent data\n")
-  (insert "\n"))
+  (insert "Date          Value     Comment\n")
+  (if (null (assoc-default 'recent_data goal))
+      (insert "No recent datapoints\n")
+      (seq-doseq (datapoint (assoc-default 'recent_data goal))
+        (insert (format "%-10s " (beeminder--format-daystamp (assoc-default 'daystamp datapoint))))
+        (insert (format "%8s "   (assoc-default 'value datapoint)))
+        (insert "    ")
+        (insert (assoc-default 'comment datapoint))
+        (insert "\n")))
+  (insert "\n")
+
+  (if (> (assoc-default 'numpts goal) 10)
+      (insert "  View all data ->\n")))
+
+(defun beeminder--format-daystamp (daystamp)
+  "Format a DAYSTAMP in the format YYYYMMDD."
+  (format "%s-%s-%s"
+          (substring daystamp 0 4)
+          (substring daystamp 4 6)
+          (substring daystamp 6 8)))
 
 
 ;; --------------------------------------------------
@@ -229,7 +248,7 @@ GOALS must contain valid goal data."
   ;; Insert the header.
   (insert "     Goal                   Deadline               Pledge        Derails At\n")
 
-  (dolist (goal goals)
+  (seq-doseq (goal goals)
     ;; Insert the goal
     (insert (format "%4s "   (beeminder--goal-status-indicator goal)))
     (insert (format "%-22s " (assoc-default 'title goal)))
@@ -250,7 +269,7 @@ GOALS must contain valid goal data."
   (insert "Date       Goal  Value  Comment  Date Entered\n")
 
   ;; Insert each datapoint.
-  (dolist (datapoint datapoints)
+  (seq-doseq (datapoint datapoints)
     (insert (format "%10s "  (assoc-default 'daystamp datapoint)))
     (insert (format "%-22s " (assoc-default 'requestid datapoint)))
     (insert (format "%-22s " (assoc-default 'value datapoint)))
