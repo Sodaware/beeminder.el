@@ -86,9 +86,10 @@
     "pledge": 0,
     "mathishard": [
         1428508800,
-        0.07942857142857143,
-        0.001
+        0.7942857142857143,
+        0.01
     ],
+    "safebuff": 4,
     "headsum": "Way above the yellow brick road with 91 days of safety buffer",
     "limsum": "-43.92 in 92 days",
     "datapublic": false,

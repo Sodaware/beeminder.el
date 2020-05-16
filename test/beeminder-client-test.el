@@ -157,27 +157,43 @@
     (let ((beeminder-username "test_user")
           (goal                (read-fixture "example_goal.json")))
       (beeminder--initialize-goal-buffer goal)
-      (should (string= "Goal progress" (buffer-line-contents 6))))))
+      (should (string= "Goal progress" (buffer-line-contents 6)))
+      (should (string= "START  2014-04-08 -> 0" (buffer-line-contents 7)))
+      (should (string= "NOW    2015-01-07 -> 44" (buffer-line-contents 8)))
+      (should (string= "TARGET 2015-04-08 -> 1234" (buffer-line-contents 9))))))
 
 (ert-deftest beeminder-client-test/initialize-goal-buffer-inserts-amounts-due-section ()
   (with-temp-buffer
     (let ((beeminder-username "test_user")
           (goal                (read-fixture "example_goal.json")))
       (beeminder--initialize-goal-buffer goal)
-      (should (string= "Amounts due by day" (buffer-line-contents 8))))))
+      (should (string= "Amounts due by day" (buffer-line-contents 11)))
+      (should (string= "Day          Delta    Total" (buffer-line-contents 12)))
+      (should (string= "Today            ✔        0" (buffer-line-contents 13))))))
 
 (ert-deftest beeminder-client-test/initialize-goal-buffer-inserts-statistics-section ()
   (with-temp-buffer
     (let ((beeminder-username "test_user")
           (goal                (read-fixture "example_goal.json")))
       (beeminder--initialize-goal-buffer goal)
-      (should (string= "Statistics" (buffer-line-contents 10))))))
+      (should (string= "Statistics" (buffer-line-contents 17)))
+      (should (string= "CUR DAILY RATE  0.01" (buffer-line-contents 18)))
+      (should (string= "CUR WEEKLY RATE 0.00" (buffer-line-contents 19)))
+      (should (string= "AVERAGE RATE    0 per day" (buffer-line-contents 20)))
+      (should (string= "DATA POINTS     4" (buffer-line-contents 21)))
+      (should (string= "MEAN            0" (buffer-line-contents 22)))
+      (should (string= "MEAN DELTA      0" (buffer-line-contents 23)))
+      (should (string= "90% VARIANCE    0" (buffer-line-contents 24)))
 
-(ert-deftest beeminder-client-test/initialize-goal-buffer-inserts-recent-data-section ()
-  (with-temp-buffer
-    (let ((beeminder-username "test_user")
-          (goal                (read-fixture "example_goal.json")))
-      (beeminder--initialize-goal-buffer goal)
-      (should (string= "Recent data" (buffer-line-contents 12))))))
+
+
+      )))
+
+;; (ert-deftest beeminder-client-test/initialize-goal-buffer-inserts-recent-data-section ()
+;;   (with-temp-buffer
+;;     (let ((beeminder-username "test_user")
+;;           (goal                (read-fixture "example_goal.json")))
+;;       (beeminder--initialize-goal-buffer goal)
+;;       (should (string= "Recent data" (buffer-line-contents 12))))))
 
 ;;; beeminder-client-test.el ends here

@@ -94,16 +94,65 @@
 (defun beeminder--insert-goal-progress-section (goal)
   "Insert the 'Goal progress' section for GOAL."
   (insert "Goal progress\n")
+  (insert (beeminder--format-goal-progress-field "START"  goal 'initday  'initval))
+  (insert (beeminder--format-goal-progress-field "NOW"    goal 'curday   'curval))
+  (insert (beeminder--format-goal-progress-field "TARGET" goal 'goaldate 'goalval))
   (insert "\n"))
+
+(defun beeminder--format-goal-progress-field (name goal date-field value-field)
+  "Format a progress section field with NAME for GOAL, showing DATE-FIELD and VALUE-FIELD from the goal."
+  (format "%0-6s %s -> %s\n"
+          name
+          (format-time-string "%Y-%m-%d" (assoc-default date-field goal))
+          (assoc-default value-field goal)))
 
 (defun beeminder--insert-goal-amounts-section (goal)
   "Insert the 'Goal progress' section for GOAL."
+  ;; TODO: First line ("Today") should be orange
+  ;; TODO: Second line ("Tomorrow") should be blue
+  ;; TODO: Third line ("<day>") should be green
+
   (insert "Amounts due by day\n")
+  (insert "Day          Delta    Total\n")
+  (insert (beeminder--format-goal-amount 0 goal))
+  (insert (beeminder--format-goal-amount 1 goal))
+  (insert (beeminder--format-goal-amount 2 goal))
   (insert "\n"))
+
+(defun beeminder--format-goal-amount (offset goal)
+  (format "%0-16s %s %s\n"
+          (beeminder--format-goal-amount-day   offset)
+          (beeminder--format-goal-amount-delta goal offset)
+          (beeminder--format-goal-amount-total goal offset)))
+
+(defun beeminder--format-goal-amount-day (day)
+  "Format the DAY name to show in goal amounts table."
+  ;; TODO: Fix this.
+  (cond
+   ((= 0 day) "Today")
+   ((= 1 day) "Tomorrow")
+   ((= 2 day) "+1")))
+
+(defun beeminder--format-goal-amount-delta (goal day)
+  "Format GOAL delta amount for DAY."
+  ;; TODO: Eventually would like to calculate this, rather than just splitting the delta_text var
+  (elt (split-string (assoc-default 'delta_text goal) " ") day))
+
+(defun beeminder--format-goal-amount-total (goal day)
+  "Format the GOAL amount required to not fail on DAY."
+  ;; If value for the day is
+  (format "%08s" 0))
 
 (defun beeminder--insert-goal-statistics-section (goal)
   "Insert the 'Goal progress' section for GOAL."
   (insert "Statistics\n")
+  (insert (format "CUR DAILY RATE  %.2f\n" (elt (assoc-default 'mathishard goal) 2)))
+  (insert (format "CUR WEEKLY RATE %.2f\n" (/ (elt (assoc-default 'mathishard goal) 2) 7)))
+  (insert "AVERAGE RATE    0 per day\n")
+  (insert (format "DATA POINTS     %s\n" (assoc-default 'numpts goal)))
+  (insert "MEAN            0\n")
+  (insert "MEAN DELTA      0\n")
+  (insert "90% VARIANCE    0\n")
   (insert "\n"))
 
 (defun beeminder--insert-goal-recent-data-section (goal)
