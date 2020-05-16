@@ -179,13 +179,19 @@ GOALS must contain valid goal data."
   ;; Insert the header.
   (insert "     Goal                   Deadline               Pledge        Derails At\n")
 
-  ;; Insert each goal.
   (dolist (goal goals)
+    ;; Insert the goal
     (insert (format "%4s "   (beeminder--goal-status-indicator goal)))
     (insert (format "%-22s " (assoc-default 'title goal)))
     (insert (format "%-22s " (beeminder--goal-deadline-indicator goal)))
     (insert (format "%6s  "  (assoc-default 'amount (assoc-default 'contract goal))))
     (insert (format "%11s"   (format-time-string "%Y-%m-%d %H:%M" (assoc-default 'goaldate goal))))
+
+    ;; Add goal slug as a property so we can look it up later.
+    (put-text-property (line-beginning-position)
+                       (line-end-position)
+                       'beeminder-goal-slug
+                       (assoc-default 'slug goal))
     (insert "\n")))
 
 (defun beeminder--insert-datapoints-table (datapoints)
@@ -202,9 +208,21 @@ GOALS must contain valid goal data."
     (insert (format "%11s"   (format-time-string "%Y-%m-%d %H:%M" (assoc-default 'timestamp datapoint))))
     (insert "\n")))
 
+(defun beeminder--goal-at-point ()
+  "Get the beeminder goal at the current point."
+  (get-text-property (point) 'beeminder-goal-slug))
+
+(defun beeminder-visit-goal-at-point ()
+  "Visit the beeminder goal at the current point."
+  (interactive)
+  (let ((goal (beeminder--goal-at-point)))
+    (when (not (string= "" goal))
+      (beeminder-view-goal goal))))
+
 (defun beeminder--test-goals ()
   "TEST GOALS REMOVE THIS."
   '(((title . "something")
+     (slug  . "example_goal")
      (limsum . "+13 in 2 days")
      (limsumdays . "+13 due in 2 days")
      (baremin . "+13")
@@ -217,6 +235,7 @@ GOALS must contain valid goal data."
      (lost . nil)
      (contract . ((amount . 30.0))))
     ((title . "something else")
+     (slug  . "something_else")
      (limsum . "+15 in 2 days")
      (limsumdays . "+13 due in 2 days")
      (baremin . "+10")
@@ -309,10 +328,12 @@ GOALS must contain valid goal data."
 
 (define-derived-mode beeminder-goals-mode beeminder-mode "Beeminder Goals"
   "Mode for browsing a list of beeminder goals."
+  ;; beeminder-goals-mode-map
   ;; KEYMAP:
   ;; g       -- refresh buffer
   ;; <tab>   -- Open the current goal
   ;; <enter> -- Go to goal detail page
+  (define-key beeminder-goals-mode-map (kbd "<RET>") #'beeminder-visit-goal-at-point)
 
   ;; Font locking
   )
