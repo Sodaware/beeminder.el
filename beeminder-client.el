@@ -48,29 +48,6 @@
           (beeminder-goals-mode)
           (switch-to-buffer (get-buffer (beeminder-goals--buffer-name)))))))
 
-;; TODO: Trash this? Or fix it.
-(defun beeminder-goals-mode ()
-  "Major mode for viewing the Beeminder goals list."
-  (interactive)
-  (setq major-mode 'beeminder-goals-mode
-        mode-name "beeminder-goals"))
-
-(define-derived-mode beeminder-mode special-mode "Beeminder"
-  "Base mode which other Beeminder modes inherit."
-  :group 'beeminder-modes
-  (buffer-disable-undo)
-  (setq buffer-read-only t
-        truncate-lines t
-        show-trailing-whitespace nil))
-
-(define-derived-mode beeminder-goals-mode beeminder-mode "Beeminder Goals"
-  "Mode for browsing a list of beeminder goals."
-  ;; KEYMAP:
-  ;; g       -- refresh buffer
-  ;; <tab>   -- Open the current goal
-  ;; <enter> --
-  )
-
 (defun beeminder--initialize-goals-buffer ()
   "Initialize the goals buffer.
 
@@ -238,6 +215,29 @@ GOALS must contain valid goal data."
                 (format "Goal: %s" (assoc-default 'title goal)))
               (beeminder-fetch-goals beeminder-username)
               "\n")))
+
+
+;; --------------------------------------------------
+;; -- Mode Definitions
+
+(define-derived-mode beeminder-mode special-mode "Beeminder"
+  "Base mode which other Beeminder modes inherit."
+  :group 'beeminder-modes
+  (buffer-disable-undo)
+  (setq buffer-read-only t
+        truncate-lines t
+        show-trailing-whitespace nil))
+
+(define-derived-mode beeminder-goals-mode beeminder-mode "Beeminder Goals"
+  "Mode for browsing a list of beeminder goals."
+  ;; KEYMAP:
+  ;; g       -- refresh buffer
+  ;; <tab>   -- Open the current goal
+  ;; <enter> --
+
+  ;; Font locking
+  )
+
 
 
 ;; --------------------------------------------------
