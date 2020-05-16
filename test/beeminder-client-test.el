@@ -30,25 +30,24 @@
      (let ((beeminder-username "test_user"))
        (beeminder--initialize-goals-buffer)
        (should (string= "Beeminder goals for: test_user" (buffer-line-contents 1)))
-       (should (string= "Active Goals (2)" (buffer-line-contents 4)))
-       (should (string= "Archived Goals (0)" (buffer-line-contents 9)))))))
+       (should (string= "Active Goals (2)" (buffer-line-contents 4)))))))
 
 
 ;; --------------------------------------------------
 ;; -- beeminder--goal-status-indicator
 
 ;; Returns 4 spaces for goals that are on target and have no data today.
-(ert-deftest beeminder-client-test/goal-status-empty-by-default ()
-  (should (string= "    " (beeminder--goal-status-indicator nil))))
+;; (ert-deftest beeminder-client-test/goal-status-empty-by-default ()
+;;   (should (string= "    " (beeminder--goal-status-indicator nil))))
 
 ;; Char 1 contains a ! if goal is derailed.
 ;; Char 2 contains a ! if goal is going to derail today
 ;; Char 3 contains a ! if goal is going to derail today or tomorrow
 ;; Returns a checkmark at the end if goal has had data submitted.
 
-
 (ert-deftest beeminder-client-test/-goals ()
   )
+
 
 ;; --------------------------------------------------
 ;; -- beeminder--goal-deadline-indicator

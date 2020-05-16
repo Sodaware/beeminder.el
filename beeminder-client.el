@@ -78,32 +78,17 @@ Fetches goal data from Beeminder and creates the initial content
 for the beeminder-goals buffer."
   (insert (format "Beeminder goals for: %s\n"   beeminder-username))
   (insert (format "Data fetched at    : %s\n\n" (format-time-string "%a %H:%M:%S" (current-time))))
-  (beeminder--insert-active-goals)
-  (insert "\n")
-  (beeminder--insert-archived-goals))
-
-(defun beeminder--insert-active-goals ()
-  "Insert active goals into buffer."
   ;; (beeminder-get-user-goals beeminder-username)
   (let ((goals (beeminder--test-goals)))
-    (insert (format "Active Goals (%d)\n" (length goals)))
-    (if goals
-        (beeminder--insert-goal-table goals)
-        (insert "No active goals"))))
+    (beeminder--insert-active-goals goals)
+    (insert "\n")))
 
-(defun beeminder--insert-archived-goals ()
-  "Insert archived goals into buffer."
-  ;; (beeminder-get-user-goals beeminder-username)
-  (let ((goals nil))
-    (insert (format "Archived Goals (%d)\n" (length goals)))
-    (if goals
-        (progn
-          (insert "     Goal                 Deadline              Deadline Date      Pledge\n")
-          (dolist (goal goals)
-            (insert "     ")                     ;; Status
-            (insert (assoc-default 'title goal)) ;; Name
-            (insert "+5.00 due in 8 days")))
-        (insert "No archived goals"))))
+(defun beeminder--insert-active-goals (goals)
+  "Insert active goals from GOALS into buffer."
+  (insert (format "Active Goals (%d)\n" (length goals)))
+  (if goals
+      (beeminder--insert-goal-table goals)
+      (insert "No active goals")))
 
 (defun beeminder--goal-status-indicator (goal)
   "Generate indicator for GOAL."
