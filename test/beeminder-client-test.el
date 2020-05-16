@@ -112,10 +112,72 @@
 
 
 ;; --------------------------------------------------
-;; -- beeminder--filter-active-goals
+;; -- beeminder--initialize-goal-buffer
 
-(ert-deftest beeminder-client-test/filter-active-goals-returns-empty-list-if-no-goals ()
-  (should (eq '() (beeminder--filter-active-goals nil))))
+(ert-deftest beeminder-client-test/initialize-goal-buffer-inserts-title ()
+  (with-temp-buffer
+    (let ((beeminder-username "test_user")
+          (goal                (read-fixture "example_goal.json")))
+      (beeminder--initialize-goal-buffer goal)
+      (should (string= "Example Goal (test_user/example_goal)" (buffer-line-contents 1))))))
 
+(ert-deftest beeminder-client-test/initialize-goal-buffer-inserts-description-if-set ()
+  (with-temp-buffer
+    (let ((beeminder-username "test_user")
+          (goal                (read-fixture "example_goal.json")))
+      (beeminder--initialize-goal-buffer goal)
+      (should (string= "This is an example goal" (buffer-line-contents 3))))))
+
+(ert-deftest beeminder-client-test/initialize-goal-buffer-skips-description-if-empty ()
+  (with-temp-buffer
+    (let ((beeminder-username "test_user")
+          (goal                (read-fixture "example_goal.json")))
+      (add-to-list 'goal '(description . ""))
+      (beeminder--initialize-goal-buffer goal)
+      (should-not (string= "This is an example goal" (buffer-line-contents 3))))))
+
+(ert-deftest beeminder-client-test/initialize-goal-buffer-inserts-fineprint-if-set ()
+  (with-temp-buffer
+    (let ((beeminder-username "test_user")
+          (goal                (read-fixture "example_goal.json")))
+      (beeminder--initialize-goal-buffer goal)
+      (should (string= "This should not break anything" (buffer-line-contents 4))))))
+
+(ert-deftest beeminder-client-test/initialize-goal-buffer-skips-fineprint-if-empty ()
+  (with-temp-buffer
+    (let ((beeminder-username "test_user")
+          (goal                (read-fixture "example_goal.json")))
+      (add-to-list 'goal '(fineprint . ""))
+      (beeminder--initialize-goal-buffer goal)
+      (should-not (string= "This should not break anything" (buffer-line-contents 4))))))
+
+;; TODO: Should search the buffer for these instead of hard-coding buffer lines.
+(ert-deftest beeminder-client-test/initialize-goal-buffer-inserts-progress-section ()
+  (with-temp-buffer
+    (let ((beeminder-username "test_user")
+          (goal                (read-fixture "example_goal.json")))
+      (beeminder--initialize-goal-buffer goal)
+      (should (string= "Goal progress" (buffer-line-contents 6))))))
+
+(ert-deftest beeminder-client-test/initialize-goal-buffer-inserts-amounts-due-section ()
+  (with-temp-buffer
+    (let ((beeminder-username "test_user")
+          (goal                (read-fixture "example_goal.json")))
+      (beeminder--initialize-goal-buffer goal)
+      (should (string= "Amounts due by day" (buffer-line-contents 8))))))
+
+(ert-deftest beeminder-client-test/initialize-goal-buffer-inserts-statistics-section ()
+  (with-temp-buffer
+    (let ((beeminder-username "test_user")
+          (goal                (read-fixture "example_goal.json")))
+      (beeminder--initialize-goal-buffer goal)
+      (should (string= "Statistics" (buffer-line-contents 10))))))
+
+(ert-deftest beeminder-client-test/initialize-goal-buffer-inserts-recent-data-section ()
+  (with-temp-buffer
+    (let ((beeminder-username "test_user")
+          (goal                (read-fixture "example_goal.json")))
+      (beeminder--initialize-goal-buffer goal)
+      (should (string= "Recent data" (buffer-line-contents 12))))))
 
 ;;; beeminder-client-test.el ends here

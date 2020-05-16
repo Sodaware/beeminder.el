@@ -48,6 +48,72 @@
           (beeminder-goals-mode)
           (switch-to-buffer (get-buffer (beeminder-goals--buffer-name)))))))
 
+
+;; --------------------------------------------------
+;; -- Goal details page
+
+(defun beeminder-view-goal (goal-name)
+  "Display a page detailing GOAL-NAME."
+  (interactive "MGoal: ")
+  ;; (beeminder-get-user-goal beeminder-username goal-name)
+  (let* ((goal        (beeminder--test-goal goal-name))
+         (buffer-name (beeminder-goal--buffer-name goal))
+         (buffer      (get-buffer buffer-name)))
+    (if buffer
+        (switch-to-buffer buffer)
+        (with-current-buffer (generate-new-buffer buffer-name)
+          (beeminder--initialize-goal-buffer goal)
+          (beeminder-view-goal-mode)
+          (switch-to-buffer (get-buffer buffer-name))))))
+
+
+;; --------------------------------------------------
+;; -- Goal details page - Internals
+
+(defun beeminder--initialize-goal-buffer (goal)
+  "Initialize buffer for viewing GOAL."
+  ;; Insert goal header information.
+  (insert (format "%s (%s/%s)\n\n"
+                  (assoc-default 'title goal)
+                  beeminder-username
+                  (assoc-default 'slug goal)))
+  (when (not (string= "" (assoc-default 'description goal)))
+    (insert (format "%s\n" (assoc-default 'description goal))))
+  (when (not (string= "" (assoc-default 'fineprint goal)))
+    (insert (format "%s\n" (assoc-default 'fineprint goal))))
+
+  (insert "\n")
+
+  ;; Insert sections.
+  (beeminder--insert-goal-progress-section goal)
+  (beeminder--insert-goal-amounts-section goal)
+  (beeminder--insert-goal-statistics-section goal)
+  (beeminder--insert-goal-recent-data-section goal))
+
+(defun beeminder--insert-goal-progress-section (goal)
+  "Insert the 'Goal progress' section for GOAL."
+  (insert "Goal progress\n")
+  (insert "\n"))
+
+(defun beeminder--insert-goal-amounts-section (goal)
+  "Insert the 'Goal progress' section for GOAL."
+  (insert "Amounts due by day\n")
+  (insert "\n"))
+
+(defun beeminder--insert-goal-statistics-section (goal)
+  "Insert the 'Goal progress' section for GOAL."
+  (insert "Statistics\n")
+  (insert "\n"))
+
+(defun beeminder--insert-goal-recent-data-section (goal)
+  "Insert the 'Goal progress' section for GOAL."
+  (insert "Recent data\n")
+  (insert "\n"))
+
+
+;; --------------------------------------------------
+;; -- Goal list - Internals
+
 (defun beeminder--initialize-goals-buffer ()
   "Initialize the goals buffer.
 
@@ -101,6 +167,10 @@ goals that are derailed."
 (defun beeminder-goals--buffer-name ()
   "Get the name of the Beeminder goals buffer."
   (format "beeminder: %s" beeminder-username))
+
+(defun beeminder-goal--buffer-name (goal)
+  "Get the name of the Beeminder goal buffer for GOAL."
+  (format "beeminder goal: %s" (assoc-default 'slug goal)))
 
 (defun beeminder--insert-goal-table (goals)
   "Generate text for a table of GOALS.
@@ -176,6 +246,15 @@ GOALS must contain valid goal data."
      (updated_at . 123)
      (requestid . "b"))))
 
+(defun beeminder--test-goal (goal)
+  (let* ((beeminder-fixture-directory "test/fixtures/")
+         (file (format "%s.json" goal))
+         (file-path (expand-file-name file beeminder-fixture-directory))
+         (file-contents (with-temp-buffer
+                          (insert-file-contents file-path)
+                          (buffer-string))))
+    (json-read-from-string file-contents)))
+
 
 ;; --------------------------------------------------
 ;; -- Legacy interactive functions.
@@ -233,11 +312,15 @@ GOALS must contain valid goal data."
   ;; KEYMAP:
   ;; g       -- refresh buffer
   ;; <tab>   -- Open the current goal
-  ;; <enter> --
+  ;; <enter> -- Go to goal detail page
 
   ;; Font locking
   )
 
+(define-derived-mode beeminder-view-goal-mode beeminder-mode "Beeminder Goal"
+  "Mode for viewing information about a single beeminder goal."
+  ;; Font locking
+  )
 
 
 ;; --------------------------------------------------

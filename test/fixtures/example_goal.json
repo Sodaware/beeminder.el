@@ -1,6 +1,8 @@
 {
     "slug": "example_goal",
     "title": "Example Goal",
+    "description": "This is an example goal",
+    "fineprint": "This should not break anything",
     "goalval": 1234,
     "rate": 0.001,
     "goaldate": 1428508800,
