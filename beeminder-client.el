@@ -64,6 +64,7 @@
         (with-current-buffer (generate-new-buffer buffer-name)
           (beeminder--initialize-goal-buffer goal)
           (beeminder-view-goal-mode)
+          (set (make-local-variable 'beeminder-goal) goal)
           (switch-to-buffer (get-buffer buffer-name))))))
 
 
@@ -338,8 +339,24 @@ GOALS must contain valid goal data."
   ;; Font locking
   )
 
+(defun beeminder-add-data-to-current-goal (value comment)
+  "Add VALUE with COMMENT to the currently viewed goal."
+  (interactive "MValue: \nMComment: \n")
+  ;; TODO: Probably want to check this is a goal buffer.
+  ;;  (beeminder-add-data (assoc-default 'slug beeminder-goal) value comment)
+
+  ;; Clear and refresh the buffer.
+  ;; TODO: Extract this.
+  (setq buffer-read-only nil)
+  (erase-buffer)
+  (beeminder--initialize-goal-buffer beeminder-goal)
+  (setq buffer-read-only t))
+
 (define-derived-mode beeminder-view-goal-mode beeminder-mode "Beeminder Goal"
   "Mode for viewing information about a single beeminder goal."
+  ;; beeminder-view-goal-mode-map
+  (define-key beeminder-view-goal-mode-map (kbd "a") #'beeminder-add-data-to-current-goal)
+
   ;; Font locking
   )
 
