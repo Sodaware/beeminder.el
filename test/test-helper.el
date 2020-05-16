@@ -2,6 +2,8 @@
 (require 'el-mock)
 (require 'cl)
 
+(setq inhibit-message t)
+
 (add-to-list 'load-path (file-name-directory (directory-file-name (file-name-directory load-file-name))))
 
 (defvar beeminder-test-directory
