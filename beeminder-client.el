@@ -502,9 +502,8 @@ GOALS must contain valid goal data."
 
 (defun beeminder--guess-current-goal ()
   "Get the goal slug for either the current buffer or goal at point."
-  (if (string= "" (get-text-property (point) 'beeminder-goal-slug))
-      (assoc-default 'slug beeminder-goal)
-      (get-text-property (point) 'beeminder-goal-slug)))
+  (or (get-text-property (point) 'beeminder-goal-slug)
+      (assoc-default 'slug beeminder-goal)))
 
 
 ;; --------------------------------------------------
