@@ -69,6 +69,25 @@
 
 
 ;; --------------------------------------------------
+;; -- Goal datapoints page
+
+(defun beeminder-view-goal-datapoints (goal-name)
+  "Display a page detailing GOAL-NAME datapoints."
+  (interactive "MGoal: ")
+  ;; (beeminder-get-user-goal beeminder-username goal-name)
+  (let* ((goal        (beeminder--test-goal goal-name))
+         (buffer-name (beeminder--goal-datapoints-buffer-name goal))
+         (buffer      (get-buffer buffer-name)))
+    (if buffer
+        (switch-to-buffer buffer)
+        (with-current-buffer (generate-new-buffer buffer-name)
+          (beeminder--initialize-goal-datapoints-buffer goal)
+          (beeminder-view-goal-datapoints-mode)
+          (set (make-local-variable 'beeminder-goal) goal)
+          (switch-to-buffer (get-buffer buffer-name))))))
+
+
+;; --------------------------------------------------
 ;; -- Goal details page - Internals
 
 (defun beeminder--initialize-goal-buffer (goal)
@@ -179,6 +198,28 @@
           (substring daystamp 4 6)
           (substring daystamp 6 8)))
 
+;; --------------------------------------------------
+;; -- Goal datapoints - Internals
+
+
+(defun beeminder--initialize-goal-datapoints-buffer (goal)
+  "Initialize buffer for viewing GOAL."
+  ;; Insert goal header information.
+  (insert (format "%s (%s/%s)\n\n"
+                  (assoc-default 'title goal)
+                  beeminder-username
+                  (assoc-default 'slug goal)))
+
+  (insert "Date          Value     Comment\n")
+  (if (null (assoc-default 'recent_data goal))
+      (insert "No recent datapoints\n")
+      (seq-doseq (datapoint (assoc-default 'recent_data goal))
+        (insert (format "%-10s " (beeminder--format-daystamp (assoc-default 'daystamp datapoint))))
+        (insert (format "%8s "   (assoc-default 'value datapoint)))
+        (insert "    ")
+        (insert (assoc-default 'comment datapoint))
+        (insert "\n"))))
+
 
 ;; --------------------------------------------------
 ;; -- Goal list - Internals
@@ -240,6 +281,10 @@ goals that are derailed."
 (defun beeminder--goal-buffer-name (goal)
   "Get the name of the Beeminder goal buffer for GOAL."
   (format "beeminder goal: %s" (assoc-default 'slug goal)))
+
+(defun beeminder--goal-datapoints-buffer-name (goal)
+  "Get the name of the Beeminder goal buffer for GOAL."
+  (format "beeminder goal datapoints: %s" (assoc-default 'slug goal)))
 
 (defun beeminder--insert-goal-table (goals)
   "Generate text for a table of GOALS.
@@ -425,6 +470,8 @@ GOALS must contain valid goal data."
   ;; beeminder-view-goal-mode-map
   (define-key beeminder-view-goal-mode-map (kbd "a") #'beeminder-add-data-to-current-goal)
 
+(define-derived-mode beeminder-view-goal-datapoints-mode beeminder-mode "Beeminder Goal Datapoints"
+  "Mode for viewing datapoints for a single beeminder goal."
   ;; Font locking
   )
 
