@@ -57,7 +57,7 @@
   (interactive "MGoal: ")
   ;; (beeminder-get-user-goal beeminder-username goal-name)
   (let* ((goal        (beeminder--test-goal goal-name))
-         (buffer-name (beeminder-goal--buffer-name goal))
+         (buffer-name (beeminder--goal-buffer-name goal))
          (buffer      (get-buffer buffer-name)))
     (if buffer
         (switch-to-buffer buffer)
@@ -237,7 +237,7 @@ goals that are derailed."
   "Get the name of the Beeminder goals buffer."
   (format "beeminder: %s" beeminder-username))
 
-(defun beeminder-goal--buffer-name (goal)
+(defun beeminder--goal-buffer-name (goal)
   "Get the name of the Beeminder goal buffer for GOAL."
   (format "beeminder goal: %s" (assoc-default 'slug goal)))
 
