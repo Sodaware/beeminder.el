@@ -428,6 +428,84 @@ GOALS must contain valid goal data."
               (beeminder-fetch-goals beeminder-username)
               "\n")))
 
+;; --------------------------------------------------
+;; -- Goal helpers
+
+(defun beeminder-add-data-to-current-goal (value comment)
+  "Add VALUE with COMMENT to the currently viewed goal."
+  (interactive "MValue: \nMComment: \n")
+
+  (let ((current-goal (beeminder--guess-current-goal)))
+    (if current-goal
+        (progn
+          (beeminder-add-data current-goal value comment)
+          (beeminder-refresh-current-buffer))
+        (error "Not looking at a beeminder goal"))))
+
+(defun beeminder-refresh-current-buffer ()
+  "Refresh the current beeminder buffer."
+  (interactive)
+  (cond
+   ((beeminder--in-goals-buffer-p)           (beeminder--refresh-goals-buffer))
+   ((beeminder--in-goal-buffer-p)            (beeminder--refresh-goal-buffer))
+   ((beeminder--in-goal-datapoints-buffer-p) (beeminder--refresh-goal-datapoints-buffer))))
+
+(defun beeminder--refresh-goals-buffer ()
+  "Refresh the goals buffer."
+  (setq buffer-read-only nil)
+  (erase-buffer)
+  (beeminder--initialize-goals-buffer)
+  (beeminder-goals-mode))
+
+(defun beeminder--refresh-goal-buffer ()
+  "Refresh the current goal buffer."
+  ;; Store the buffer goal as it's a local variable that gets cleared when
+  ;; calling `erase-buffer`.
+  (let ((current-goal beeminder-goal))
+    (setq buffer-read-only nil)
+    (erase-buffer)
+    (beeminder--initialize-goal-buffer current-goal)
+    (beeminder-view-goal-mode)
+    (set (make-local-variable 'beeminder-goal) current-goal)))
+
+(defun beeminder--refresh-goal-datapoints-buffer ()
+  "Refresh the current goal datapoints buffer."
+  ;; TODO: Doesn't work
+  (setq buffer-read-only nil)
+  (erase-buffer)
+  (beeminder--initialize-goal-datapoints-buffer (beeminder--guess-current-goal))
+  (beeminder-view-goal-datapoints-mode))
+
+(defun beeminder--in-goals-buffer-p ()
+  "Are we looking at the goals list buffer?"
+  (beeminder--looking-at-mode-p "beeminder-goals-mode"))
+
+(defun beeminder--in-goal-buffer-p ()
+  "Are we looking at a single goal buffer?"
+  (beeminder--looking-at-mode-p "beeminder-view-goal-mode"))
+
+(defun beeminder--in-goal-datapoints-buffer-p ()
+  "Are we looking at a goal's datapoints buffer?"
+  (beeminder--looking-at-mode-p "beeminder-view-goal-datapoints-mode"))
+
+(defun beeminder--looking-at-mode-p (mode)
+  "Are we looking at a specific MODE?"
+  (string= mode major-mode))
+
+(defun beeminder-view-data-for-current-goal ()
+  "Add VALUE with COMMENT to the currently viewed goal."
+  (interactive)
+  (let ((current-goal (beeminder--guess-current-goal)))
+    (if (string= "" current-goal)
+        (error "Not looking at a beeminder goal")
+        (beeminder-view-goal-datapoints current-goal))))
+
+(defun beeminder--guess-current-goal ()
+  "Get the goal slug for either the current buffer or goal at point."
+  (if (string= "" (get-text-property (point) 'beeminder-goal-slug))
+      (assoc-default 'slug beeminder-goal)
+      (get-text-property (point) 'beeminder-goal-slug)))
+
 
 ;; --------------------------------------------------
 ;; -- Mode Definitions
@@ -435,6 +513,7 @@ GOALS must contain valid goal data."
 (define-derived-mode beeminder-mode special-mode "Beeminder"
   "Base mode which other Beeminder modes inherit."
   :group 'beeminder-modes
+  (define-key beeminder-mode-map (kbd "g") #'beeminder-refresh-current-buffer)
   (buffer-disable-undo)
   (setq buffer-read-only t
         truncate-lines t
@@ -448,27 +527,20 @@ GOALS must contain valid goal data."
   ;; <tab>   -- Open the current goal
   ;; <enter> -- Go to goal detail page
   (define-key beeminder-goals-mode-map (kbd "<RET>") #'beeminder-visit-goal-at-point)
+  (define-key beeminder-goals-mode-map (kbd "a")     #'beeminder-add-data-to-current-goal)
+  (define-key beeminder-goals-mode-map (kbd "d")     #'beeminder-view-data-for-current-goal)
 
   ;; Font locking
   )
-
-(defun beeminder-add-data-to-current-goal (value comment)
-  "Add VALUE with COMMENT to the currently viewed goal."
-  (interactive "MValue: \nMComment: \n")
-  ;; TODO: Probably want to check this is a goal buffer.
-  ;;  (beeminder-add-data (assoc-default 'slug beeminder-goal) value comment)
-
-  ;; Clear and refresh the buffer.
-  ;; TODO: Extract this.
-  (setq buffer-read-only nil)
-  (erase-buffer)
-  (beeminder--initialize-goal-buffer beeminder-goal)
-  (setq buffer-read-only t))
 
 (define-derived-mode beeminder-view-goal-mode beeminder-mode "Beeminder Goal"
   "Mode for viewing information about a single beeminder goal."
   ;; beeminder-view-goal-mode-map
   (define-key beeminder-view-goal-mode-map (kbd "a") #'beeminder-add-data-to-current-goal)
+  (define-key beeminder-view-goal-mode-map (kbd "d") #'beeminder-view-data-for-current-goal)
+
+  ;; Font locking
+  )
 
 (define-derived-mode beeminder-view-goal-datapoints-mode beeminder-mode "Beeminder Goal Datapoints"
   "Mode for viewing datapoints for a single beeminder goal."
