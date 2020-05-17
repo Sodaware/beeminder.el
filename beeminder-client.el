@@ -91,7 +91,9 @@
 ;; -- Goal details page - Internals
 
 (defun beeminder--initialize-goal-buffer (goal)
-  "Initialize buffer for viewing GOAL."
+  "Initialize buffer for viewing GOAL.
+
+GOAL must be an associative array of goal information from the API."
   ;; Insert goal header information.
   (insert (format "%s (%s/%s)\n\n"
                   (assoc-default 'title goal)
@@ -395,16 +397,14 @@ GOALS must contain valid goal data."
 (defun beeminder-add-data (goal value comment)
   "Update Beeminder GOAL with VALUE and COMMENT."
   (interactive "MGoal: \nnValue: \nMComment: \n")
-  (let ((result
-         ;; Send the request.
-         (beeminder--post
-          (beeminder--create-endpoint
-           (format "users/%s/goals/%s/datapoints" beeminder-username goal))
-          (beeminder--build-post-body
-           (list :auth_token beeminder-auth-token
-                 :value      value
-                 :comment    (url-hexify-string comment))))))
-    ;; Show what happened.
+  (let ((result (beeminder--post
+                 (beeminder--create-endpoint
+                  (format "users/%s/goals/%s/datapoints" beeminder-username goal))
+                 (beeminder--build-post-body
+                  (list :auth_token beeminder-auth-token
+                        :value      value
+                        :comment    (url-hexify-string comment))))))
+    ;; Show the added timestamp sent from Beeminder.
     (message
      "Data added at %s"
      (format-time-string "%Y-%m-%d %a %H:%M:%S"
