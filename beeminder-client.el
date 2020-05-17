@@ -26,6 +26,7 @@
 ;; Dependencies
 
 (require 'beeminder)
+(require 'button)
 
 
 ;; TODO: Maybe split this into another file?
@@ -190,8 +191,12 @@ GOAL must be an associative array of goal information from the API."
         (insert "\n")))
   (insert "\n")
 
-  (if (> (assoc-default 'numpts goal) 10)
-      (insert "  View all data ->\n")))
+  ;; If there are multiple data points, add a "View all data" button.
+  (when (> (assoc-default 'numpts goal) 10)
+    (insert "  ")
+    (insert-button "View all data"
+                   'action (lambda (_arg) (beeminder-view-data-for-current-goal)))
+    (insert "\n")))
 
 (defun beeminder--format-daystamp (daystamp)
   "Format a DAYSTAMP in the format YYYYMMDD."
@@ -199,6 +204,7 @@ GOAL must be an associative array of goal information from the API."
           (substring daystamp 0 4)
           (substring daystamp 4 6)
           (substring daystamp 6 8)))
+
 
 ;; --------------------------------------------------
 ;; -- Goal datapoints - Internals
