@@ -37,17 +37,17 @@
 ;; TODO: Fetch goals for new buffer.
 ;; TODO: DRY up this function
 (defun beeminder-goals ()
-  "Display an interactive list of your current goals."
+  "Display an interactive list of your current Beeminder goals."
   (interactive)
   ;; Get the buffer for the current user and return it.  If no buffer found,
   ;; create and switch to it.
-  (let ((buffer (get-buffer (beeminder-goals--buffer-name))))
+  (let ((buffer (get-buffer (beeminder--goals-buffer-name))))
     (if buffer
         (switch-to-buffer buffer)
-        (with-current-buffer (generate-new-buffer (beeminder-goals--buffer-name))
+        (with-current-buffer (generate-new-buffer (beeminder--goals-buffer-name))
           (beeminder--initialize-goals-buffer)
           (beeminder-goals-mode)
-          (switch-to-buffer (get-buffer (beeminder-goals--buffer-name)))))))
+          (switch-to-buffer (get-buffer (beeminder--goals-buffer-name)))))))
 
 
 ;; --------------------------------------------------
@@ -282,7 +282,7 @@ goals that are derailed."
       "DERAILED"
       (assoc-default 'limsumdays goal)))
 
-(defun beeminder-goals--buffer-name ()
+(defun beeminder--goals-buffer-name ()
   "Get the name of the Beeminder goals buffer."
   (format "beeminder: %s" beeminder-username))
 
