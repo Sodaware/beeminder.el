@@ -201,7 +201,7 @@
           (goal                (read-fixture "example_goal.json")))
       (add-to-list 'goal '(numpts . 30))
       (beeminder--initialize-goal-buffer goal)
-      (should (string= "  View all data ->" (buffer-line-contents 31))))))
+      (should (string= "  View all data" (buffer-line-contents 31))))))
 
 (ert-deftest beeminder-client-test/initialize-goal-buffer-does-not-insert-data-link-if-not-enough-datapoints ()
   (with-temp-buffer
@@ -209,6 +209,6 @@
           (goal                (read-fixture "example_goal.json")))
       (add-to-list 'goal '(numpts . 3))
       (beeminder--initialize-goal-buffer goal)
-      (should-not (string= "  View all data ->" (buffer-line-contents 31))))))
+      (should-not (string= "  View all data" (buffer-line-contents 31))))))
 
 ;;; beeminder-client-test.el ends here
