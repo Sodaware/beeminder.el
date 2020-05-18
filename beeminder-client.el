@@ -31,23 +31,32 @@
 
 ;; TODO: Maybe split this into another file?
 
+
+;; --------------------------------------------------
+;; -- Utility Macros
+
+(defmacro beeminder--create-or-switch-to-buffer (buffer-name &rest body)
+  "Switch to BUFFER-NAME, or create it and run BODY if it does not exist."
+  (declare (indent 0))
+  `(let ((buffer (get-buffer ,buffer-name)))
+     (if buffer
+         (switch-to-buffer buffer)
+         (with-current-buffer (generate-new-buffer ,buffer-name)
+           (progn ,@body)
+           (switch-to-buffer (get-buffer ,buffer-name))))))
+
+
 ;; --------------------------------------------------
 ;; -- Goal list
 
-;; TODO: Fetch goals for new buffer.
-;; TODO: DRY up this function
 (defun beeminder-goals ()
   "Display an interactive list of your current Beeminder goals."
   (interactive)
-  ;; Get the buffer for the current user and return it.  If no buffer found,
-  ;; create and switch to it.
-  (let ((buffer (get-buffer (beeminder--goals-buffer-name))))
-    (if buffer
-        (switch-to-buffer buffer)
-        (with-current-buffer (generate-new-buffer (beeminder--goals-buffer-name))
-          (beeminder--initialize-goals-buffer)
-          (beeminder-goals-mode)
-          (switch-to-buffer (get-buffer (beeminder--goals-buffer-name)))))))
+  (beeminder--create-or-switch-to-buffer
+   (beeminder--goals-buffer-name)
+   (progn
+     (beeminder--initialize-goals-buffer)
+     (beeminder-goals-mode))))
 
 
 ;; --------------------------------------------------
@@ -58,34 +67,30 @@
   (interactive "MGoal: ")
   ;; (beeminder-get-user-goal beeminder-username goal-name)
   (let* ((goal        (beeminder--test-goal goal-name))
-         (buffer-name (beeminder--goal-buffer-name goal))
-         (buffer      (get-buffer buffer-name)))
-    (if buffer
-        (switch-to-buffer buffer)
-        (with-current-buffer (generate-new-buffer buffer-name)
-          (beeminder--initialize-goal-buffer goal)
-          (beeminder-view-goal-mode)
-          (set (make-local-variable 'beeminder-goal) goal)
-          (switch-to-buffer (get-buffer buffer-name))))))
+         (buffer-name (beeminder--goal-buffer-name goal)))
+    (beeminder--create-or-switch-to-buffer
+     buffer-name
+     (progn
+       (beeminder--initialize-goal-buffer goal)
+       (beeminder-view-goal-mode)
+       (set (make-local-variable 'beeminder-goal) goal)))))
 
 
 ;; --------------------------------------------------
 ;; -- Goal datapoints page
 
 (defun beeminder-view-goal-datapoints (goal-name)
-  "Display a page detailing GOAL-NAME datapoints."
+  "Display a page showing datapoints for GOAL-NAME."
   (interactive "MGoal: ")
   ;; (beeminder-get-user-goal beeminder-username goal-name)
   (let* ((goal        (beeminder--test-goal goal-name))
-         (buffer-name (beeminder--goal-datapoints-buffer-name goal))
-         (buffer      (get-buffer buffer-name)))
-    (if buffer
-        (switch-to-buffer buffer)
-        (with-current-buffer (generate-new-buffer buffer-name)
-          (beeminder--initialize-goal-datapoints-buffer goal)
-          (beeminder-view-goal-datapoints-mode)
-          (set (make-local-variable 'beeminder-goal) goal)
-          (switch-to-buffer (get-buffer buffer-name))))))
+         (buffer-name (beeminder--goal-datapoints-buffer-name goal)))
+    (beeminder--create-or-switch-to-buffer
+     buffer-name
+     (progn
+       (beeminder--initialize-goal-datapoints-buffer goal)
+       (beeminder-view-goal-datapoints-mode)
+       (set (make-local-variable 'beeminder-goal) goal)))))
 
 
 ;; --------------------------------------------------
