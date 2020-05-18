@@ -65,11 +65,9 @@
 (defun beeminder-view-goal (goal-name)
   "Display a page detailing GOAL-NAME."
   (interactive "MGoal: ")
-  ;; (beeminder-get-user-goal beeminder-username goal-name)
-  (let* ((goal        (beeminder--test-goal goal-name))
-         (buffer-name (beeminder--goal-buffer-name goal)))
+  (let ((goal (beeminder-get-user-goal beeminder-username goal-name)))
     (beeminder--create-or-switch-to-buffer
-     buffer-name
+     (beeminder--goal-buffer-name goal)
      (progn
        (beeminder--initialize-goal-buffer goal)
        (beeminder-view-goal-mode)
@@ -82,11 +80,9 @@
 (defun beeminder-view-goal-datapoints (goal-name)
   "Display a page showing datapoints for GOAL-NAME."
   (interactive "MGoal: ")
-  ;; (beeminder-get-user-goal beeminder-username goal-name)
-  (let* ((goal        (beeminder--test-goal goal-name))
-         (buffer-name (beeminder--goal-datapoints-buffer-name goal)))
+  (let ((goal (beeminder-get-user-goal beeminder-username goal-name)))
     (beeminder--create-or-switch-to-buffer
-     buffer-name
+     (beeminder--goal-datapoints-buffer-name goal)
      (progn
        (beeminder--initialize-goal-datapoints-buffer goal)
        (beeminder-view-goal-datapoints-mode)
@@ -244,10 +240,8 @@ Fetches goal data from Beeminder and creates the initial content
 for the beeminder-goals buffer."
   (insert (format "Beeminder goals for: %s\n"   beeminder-username))
   (insert (format "Data fetched at    : %s\n\n" (format-time-string "%a %H:%M:%S" (current-time))))
-  ;; (beeminder-get-user-goals beeminder-username)
-  (let ((goals (beeminder--test-goals)))
-    (beeminder--insert-active-goals goals)
-    (insert "\n")))
+  (beeminder--insert-active-goals (beeminder-get-user-goals beeminder-username))
+  (insert "\n"))
 
 (defun beeminder--insert-active-goals (goals)
   "Insert active goals from GOALS into buffer."
@@ -345,61 +339,6 @@ GOALS must contain valid goal data."
   (let ((goal (beeminder--goal-at-point)))
     (when (not (string= "" goal))
       (beeminder-view-goal goal))))
-
-(defun beeminder--test-goals ()
-  "TEST GOALS REMOVE THIS."
-  '(((title . "something")
-     (slug  . "example_goal")
-     (limsum . "+13 in 2 days")
-     (limsumdays . "+13 due in 2 days")
-     (baremin . "+13")
-     (roadstatuscolor . "blue")
-     (timestamp  . 1562342400)
-     (lastday . 1562342400)
-     (goaldate . 1562342400)
-     (yaw . -1)
-     (lane . 1)
-     (lost . nil)
-     (contract . ((amount . 30.0))))
-    ((title . "something else")
-     (slug  . "something_else")
-     (limsum . "+15 in 2 days")
-     (limsumdays . "+13 due in 2 days")
-     (baremin . "+10")
-     (roadstatuscolor . "red")
-     (timestamp  . 1562342400)
-     (lastday . 1562342400)
-     (goaldate . 1562342400)
-     (yaw . -1)
-     (lane . 1)
-     (lost . 1)
-     (contract . ((amount . 30.0))))))
-
-(defun beeminder--test-datapoints ()
-  "TEST DATAPOINTS REMOVE THIS."
-  '(((id         . "1")
-     (timestamp  . 1562342400)
-     (daystamp   . "20191010")
-     (value      . "12")
-     (comment    . "Example datapoint")
-     (updated_at . 123)
-     (requestid . "a"))
-    ((id         . "2")
-     (timestamp  . 1562342410)
-     (daystamp   . "20191011")
-     (value      . "15")
-     (comment    . "Another example datapoint")
-     (updated_at . 123)
-     (requestid . "b"))))
-
-(defun beeminder--test-goal (goal)
-  (let* ((beeminder-fixture-directory "test/fixtures/")
-         (file (format "%s.json" goal))
-         (file-path (expand-file-name file beeminder-fixture-directory))
-         (file-contents (with-temp-buffer
-                          (insert-file-contents file-path)
-                          (buffer-string))))
-    (json-read-from-string file-contents)))
 
 
 ;; --------------------------------------------------
