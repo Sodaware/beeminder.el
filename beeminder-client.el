@@ -459,6 +459,7 @@ GOALS must contain valid goal data."
 ;; --------------------------------------------------
 ;; -- Mode Definitions
 
+;;;###autoload
 (define-derived-mode beeminder-mode special-mode "Beeminder"
   "Base mode which other Beeminder modes inherit."
   :group 'beeminder-modes
@@ -468,6 +469,7 @@ GOALS must contain valid goal data."
         truncate-lines t
         show-trailing-whitespace nil))
 
+;;;###autoload
 (define-derived-mode beeminder-goals-mode beeminder-mode "Beeminder Goals"
   "Mode for browsing a list of beeminder goals."
   ;; beeminder-goals-mode-map
@@ -479,22 +481,30 @@ GOALS must contain valid goal data."
   (define-key beeminder-goals-mode-map (kbd "a")     #'beeminder-add-data-to-current-goal)
   (define-key beeminder-goals-mode-map (kbd "d")     #'beeminder-view-data-for-current-goal)
 
+
   ;; Font locking
   )
 
+;;;###autoload
 (define-derived-mode beeminder-view-goal-mode beeminder-mode "Beeminder Goal"
   "Mode for viewing information about a single beeminder goal."
   ;; beeminder-view-goal-mode-map
   (define-key beeminder-view-goal-mode-map (kbd "a") #'beeminder-add-data-to-current-goal)
   (define-key beeminder-view-goal-mode-map (kbd "d") #'beeminder-view-data-for-current-goal)
 
+  ;; Initialize buffer local variables.
+  ;; TODO: Rename this to beeminder-buffer-goal?
+  (set (make-local-variable 'beeminder-goal) nil)
+
   ;; Font locking
   )
 
+;;;###autoload
 (define-derived-mode beeminder-view-goal-datapoints-mode beeminder-mode "Beeminder Goal Datapoints"
   "Mode for viewing datapoints for a single beeminder goal."
   ;; Font locking
   )
+
 
 
 ;; --------------------------------------------------
