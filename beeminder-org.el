@@ -149,7 +149,7 @@ submit hours using beeminder-unit: hours."
     (setq datapoint (get-text-property (point) :org-clock-minutes))
 
     ;; If datapoint is set AND unit is hours, convert from minutes to hours.
-    (if (and datapoint (string= "hours" (org-entry-get (point) (beeminder--org-property-name 'unit))))
+    (if (and datapoint (string= "hours" (org-entry-get (point) (beeminder--org-property-name 'unit) t)))
         (setq datapoint (/ datapoint 60.0)))
 
     ;; If no valid time clocked, prompt for it.
