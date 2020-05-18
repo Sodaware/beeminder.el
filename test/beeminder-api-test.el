@@ -39,6 +39,18 @@
      (beeminder-fetch-goals))))
 
 
+;; --------------------------------------------------
+;; -- beeminder--goal-derailed-p
+
+(ert-deftest beeminder-api-test/goal-derailed-p-returns-nil-if-json-value-false ()
+  ;; TRUE if value is `t`
+  (should (eq t (beeminder--goal-derailed-p '((lost . t)))))
+  ;; FALSE if value is false, null or empty.
+  (should (eq nil (beeminder--goal-derailed-p '((lost . nil)))))
+  (should (eq nil (beeminder--goal-derailed-p '((lost . :json-null)))))
+  (should (eq nil (beeminder--goal-derailed-p '((lost . :json-false))))))
+
+
 ;; Internal Helper Tests
 
 (ert-deftest beeminder-api-test/can-create-endpoint-without-query-vars ()

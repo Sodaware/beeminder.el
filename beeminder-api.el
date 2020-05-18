@@ -124,7 +124,7 @@ the user their current pledge level."
 
 (defun beeminder--goal-derailed-p (goal)
   "Check if GOAL is derailed."
-  (assoc-default 'lost goal))
+  (eq t (assoc-default 'lost goal)))
 
 (defun beeminder--goal-in-red-p (goal)
   "Check if GOAL is in the red."
