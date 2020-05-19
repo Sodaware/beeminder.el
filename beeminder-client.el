@@ -223,6 +223,16 @@ GOAL must be an associative array of goal information from the API."
 ;; --------------------------------------------------
 ;; -- Goal datapoints - Internals
 
+(defun beeminder--insert-table-heading (header &optional width face)
+  "Insert and style a table heading with text HEADER at current point.
+
+If WIDTH is passed, will left-justify the headline to that size.
+Pass FACE to override the default table face name."
+  (let* ((width  (or width (length header)))
+         (face   (or face  'beeminder-client-table-header))
+         (header (concat header (make-string (- width (length header)) ?\s))))
+    (insert (propertize header 'face face))
+    (insert "\n")))
 
 (defun beeminder--initialize-goal-datapoints-buffer (goal)
   "Initialize buffer for viewing GOAL."
@@ -232,7 +242,8 @@ GOAL must be an associative array of goal information from the API."
                   beeminder-username
                   (assoc-default 'slug goal)))
 
-  (insert "Date          Value     Comment\n")
+  (beeminder--insert-table-heading "Date          Value     Comment" 80)
+
   (if (null (assoc-default 'recent_data goal))
       (insert "No recent datapoints\n")
       (seq-doseq (datapoint (assoc-default 'recent_data goal))
@@ -323,10 +334,7 @@ goals that are derailed."
 
 (defun beeminder--insert-goal-table (goals)
   "Insert table of GOALS into the current buffer."
-  ;; Insert the table header.
-  (insert (propertize "     Goal                   Deadline               Pledge        Derails At"
-                      'face 'beeminder-client-table-header))
-  (insert "\n")
+  (beeminder--insert-table-heading "     Goal                   Deadline               Pledge        Derails At")
 
   ;; Insert all goals.
   (seq-doseq (goal goals)
