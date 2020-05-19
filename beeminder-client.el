@@ -111,9 +111,10 @@ GOAL must be an associative array of goal information from the API."
                   (assoc-default 'title goal)
                   beeminder-username
                   (assoc-default 'slug goal)))
-  (when (not (string= "" (assoc-default 'description goal)))
+  ;; TODO: Replace these with a helper?
+  (when (assoc-default 'description goal)
     (insert (format "%s\n" (assoc-default 'description goal))))
-  (when (not (string= "" (assoc-default 'fineprint goal)))
+  (when (assoc-default 'fineprint goal)
     (insert (format "%s\n" (assoc-default 'fineprint goal))))
 
   (insert "\n")
@@ -384,7 +385,7 @@ goals that are derailed."
   "Visit the beeminder goal at the current point."
   (interactive)
   (let ((goal (beeminder--goal-at-point)))
-    (when (not (string= "" goal))
+    (when goal
       (beeminder-view-goal goal))))
 
 
