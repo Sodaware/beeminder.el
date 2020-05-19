@@ -347,7 +347,7 @@ goals that are derailed."
   ;; Insert all goals.
   (seq-doseq (goal goals)
     (insert (format "%4s "   (beeminder--goal-status-indicator goal)))
-    (insert (format "%-22s " (assoc-default 'title goal)))
+    (insert (format "%-22s " (assoc-default 'slug goal)))
     (insert (format "%-22s " (beeminder--goal-deadline-indicator goal)))
     (insert (format "%6s  "  (assoc-default 'amount (assoc-default 'contract goal))))
     (insert (format "%11s"   (format-time-string "%Y-%m-%d %H:%M" (assoc-default 'goaldate goal))))
