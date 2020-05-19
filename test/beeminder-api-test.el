@@ -1,6 +1,13 @@
-;; API Tests
+;; beeminder-api-test.el --- Tests for beeminder-api file.
 
-;; beeminder-user-info
+;;; Commentary:
+
+;; Tests for `beeminder-api.el`.  Tests API interactions and helper functions.
+
+;;; Code:
+
+;; --------------------------------------------------
+;; -- ;; beeminder-user-info
 
 (ert-deftest beeminder-api-test/beeminder-user-info-returns-alist ()
   (let ((beeminder-auth-token "ABCDEF"))
@@ -11,7 +18,8 @@
        (should (string= "test_user" (assoc-default 'username info)))))))
 
 
-;; beeminder-me
+;; --------------------------------------------------
+;; -- beeminder-me
 
 (ert-deftest beeminder-api-test/beeminder-me-returns-alist ()
   (let ((beeminder-auth-token "ABCDEF"))
@@ -29,7 +37,9 @@
        (should (listp info))
        (should (string= "no_token" (assoc-default 'token (assoc-default 'errors info))))))))
 
-;; goals
+
+;; --------------------------------------------------
+;; -- beeminder-fetch-goals
 
 (ert-deftest beeminder-api-test/fetch-goals-uses-global-when-no-override ()
   (let ((beeminder-username "GLOBAL-USERNAME")
@@ -51,7 +61,22 @@
   (should (eq nil (beeminder--goal-derailed-p '((lost . :json-false))))))
 
 
-;; Internal Helper Tests
+;; --------------------------------------------------
+;; -- beeminder--goal-in-red-p
+
+(ert-deftest beeminder-api-test/goal-in-red-p-returns-correct-result ()
+  (should (eq t (beeminder--goal-in-red-p '((yaw . -1) (lane . 10))))))
+
+
+;; --------------------------------------------------
+;; -- beeminder--in-orange-p
+
+(ert-deftest beeminder-api-test/goal-in-orange-p-returns-correct-result ()
+  (should (eq t (beeminder--goal-in-orange-p '((yaw . -1) (lane . 1))))))
+
+
+;; --------------------------------------------------
+;; -- beeminder--create-endpoint
 
 (ert-deftest beeminder-api-test/can-create-endpoint-without-query-vars ()
   (should (string=
@@ -62,6 +87,10 @@
   (should (string=
            "https://www.beeminder.com/api/v1/test-path.json?arg=value"
            (beeminder--create-endpoint "test-path" (list :arg "value")))))
+
+
+;; --------------------------------------------------
+;; -- beeminder--build-query
 
 (ert-deftest beeminder-api-test/can-build-query-from-list ()
   (should (string=
