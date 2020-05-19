@@ -52,7 +52,8 @@
          (switch-to-buffer buffer)
          (with-current-buffer (generate-new-buffer ,buffer-name)
            (progn ,@body)
-           (switch-to-buffer (get-buffer ,buffer-name))))))
+           (switch-to-buffer (get-buffer ,buffer-name))
+           (beginning-of-buffer)))))
 
 
 ;; --------------------------------------------------
