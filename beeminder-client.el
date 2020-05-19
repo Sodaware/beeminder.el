@@ -29,7 +29,15 @@
 (require 'button)
 
 
-;; TODO: Maybe split this into another file?
+;; --------------------------------------------------
+;; -- Configuration - Client Only
+
+;; TODO: Move this to settings?
+(defcustom beeminder-fresh-indicator
+  "✓"
+  "Symbol that is displayed for fresh goals."
+  :type 'string
+  :group 'beeminder)
 
 
 ;; --------------------------------------------------
@@ -269,7 +277,7 @@ for the beeminder-goals buffer."
 
 GOAL is fresh if it had data submitted today."
   (if (beeminder--goal-fresh-p goal)
-      "✓"
+      beeminder-fresh-indicator
       " "))
 
 (defun beeminder--goal-deadline-indicator (goal)
