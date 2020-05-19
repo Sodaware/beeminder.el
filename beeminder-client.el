@@ -125,7 +125,7 @@ GOAL must be an associative array of goal information from the API."
 
 (defun beeminder--insert-goal-progress-section (goal)
   "Insert the 'Goal progress' section for GOAL."
-  (insert "Goal progress\n")
+  (beeminder--insert-section-heading "Goal progress")
   (insert (beeminder--format-goal-progress-field "START"  goal 'initday  'initval))
   (insert (beeminder--format-goal-progress-field "NOW"    goal 'curday   'curval))
   (insert (beeminder--format-goal-progress-field "TARGET" goal 'goaldate 'goalval))
@@ -144,7 +144,7 @@ GOAL must be an associative array of goal information from the API."
   ;; TODO: Second line ("Tomorrow") should be blue
   ;; TODO: Third line ("<day>") should be green
 
-  (insert "Amounts due by day\n")
+  (beeminder--insert-section-heading "Amounts due by day")
   (insert "Day          Delta    Total\n")
   (insert (beeminder--format-goal-amount 0 goal))
   (insert (beeminder--format-goal-amount 1 goal))
@@ -177,7 +177,7 @@ GOAL must be an associative array of goal information from the API."
 
 (defun beeminder--insert-goal-statistics-section (goal)
   "Insert the 'Goal progress' section for GOAL."
-  (insert "Statistics\n")
+  (beeminder--insert-section-heading "Statistics")
   (insert (format "CUR DAILY RATE  %.2f\n" (elt (assoc-default 'mathishard goal) 2)))
   (insert (format "CUR WEEKLY RATE %.2f\n" (/ (elt (assoc-default 'mathishard goal) 2) 7)))
   (insert "AVERAGE RATE    0 per day\n")
@@ -189,9 +189,10 @@ GOAL must be an associative array of goal information from the API."
 
 (defun beeminder--insert-goal-recent-data-section (goal)
   "Insert recent datapoints for GOAL."
-  (insert "Recent data\n\n")
+  (beeminder--insert-section-heading "Recent data")
+  (insert "\n")
 
-  (insert (propertize "Date          Value     Comment\n"
+  (insert (propertize "Date          Value     Comment"
                       'face 'beeminder-client-table-header))
   (insert "\n")
 
@@ -233,6 +234,16 @@ Pass FACE to override the default table face name."
     (insert (propertize header 'face face))
     (insert "\n")))
 
+(defun beeminder--insert-section-heading (heading &optional counter)
+  "Insert a section HEADING with optional COUNTER in brackets."
+  (insert (propertize heading 'face 'beeminder-section-headline))
+
+  (when counter
+    (insert (format (propertize " (%s)" 'face 'beeminder-section-headline)
+                    (propertize (format "%d" counter) 'face 'beeminder-section-counter))))
+
+  (insert "\n"))
+
 (defun beeminder--initialize-goal-datapoints-buffer (goal)
   "Initialize buffer for viewing GOAL."
   ;; Insert goal header information.
@@ -268,10 +279,8 @@ for the beeminder-goals buffer."
 
 (defun beeminder--insert-active-goals (goals)
   "Insert active goals from GOALS into buffer."
-  (insert (format (propertize "Active Goals (%s)"        'face 'beeminder-section-headline)
-                  (propertize (format "%d" (length goals)) 'face 'beeminder-section-counter)))
-
-  (insert "\n\n")
+  (beeminder--insert-section-heading "Active Goals" (length goals))
+  (insert "\n")
 
   (if goals
       (beeminder--insert-goal-table goals)
