@@ -207,7 +207,6 @@ GOAL must be an associative array of goal information from the API."
 
   ;; If there are multiple data points, add a "View all data" button.
   (when (> (assoc-default 'numpts goal) 10)
-    (insert "  ")
     (insert-button "View all data"
                    'action (lambda (_arg) (beeminder-view-data-for-current-goal)))
     (insert "\n")))

@@ -191,9 +191,9 @@
           (goal                (read-fixture "example_goal.json")))
       (beeminder--initialize-goal-buffer goal)
       (should (string= "Recent data" (buffer-line-contents 26)))
-      (should (string= "Date          Value     Comment" (buffer-line-contents 27)))
-      (should (string= "2020-05-08      1.0     First example data point" (buffer-line-contents 28)))
-      (should (string= "2020-05-05      0.5     Second example data point" (buffer-line-contents 29))))))
+      (should (string= "Date          Value     Comment" (buffer-line-contents 28)))
+      (should (string= "2020-05-08      1.0     First example data point" (buffer-line-contents 29)))
+      (should (string= "2020-05-05      0.5     Second example data point" (buffer-line-contents 30))))))
 
 (ert-deftest beeminder-client-test/initialize-goal-buffer-inserts-data-link-if-enough-datapoints ()
   (with-temp-buffer
@@ -201,7 +201,7 @@
           (goal                (read-fixture "example_goal.json")))
       (add-to-list 'goal '(numpts . 30))
       (beeminder--initialize-goal-buffer goal)
-      (should (string= "  View all data" (buffer-line-contents 31))))))
+      (should (string= "View all data" (buffer-line-contents 32))))))
 
 (ert-deftest beeminder-client-test/initialize-goal-buffer-does-not-insert-data-link-if-not-enough-datapoints ()
   (with-temp-buffer
@@ -209,6 +209,6 @@
           (goal                (read-fixture "example_goal.json")))
       (add-to-list 'goal '(numpts . 3))
       (beeminder--initialize-goal-buffer goal)
-      (should-not (string= "  View all data" (buffer-line-contents 31))))))
+      (should-not (string= "View all data" (buffer-line-contents 32))))))
 
 ;;; beeminder-client-test.el ends here
