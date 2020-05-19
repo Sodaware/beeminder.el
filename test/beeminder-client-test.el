@@ -73,12 +73,13 @@
 
 (ert-deftest beeminder-client-test/initialize-goals-buffer-inserts-headlines ()
   (with-mock
-   (stub beeminder--get)
+   (mock-get "users/test_user/goals.json" "user-example-goals.json")
    (with-temp-buffer
-     (let ((beeminder-username "test_user"))
+     (let ((beeminder-auth-token "ABCDEF")
+           (beeminder-username   "test_user"))
        (beeminder--initialize-goals-buffer)
        (should (string= "Beeminder goals for: test_user" (buffer-line-contents 1)))
-       (should (string= "Active Goals (2)" (buffer-line-contents 4)))))))
+       (should (string= "Active Goals (1)" (buffer-line-contents 4)))))))
 
 
 ;; --------------------------------------------------

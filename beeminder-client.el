@@ -526,12 +526,9 @@ goals that are derailed."
   ;; <tab>   -- Open the current goal
   ;; <enter> -- Go to goal detail page
   (define-key beeminder-goals-mode-map (kbd "<RET>") #'beeminder-visit-goal-at-point)
+  (define-key beeminder-goals-mode-map (kbd "g")     #'beeminder-refresh-current-buffer)
   (define-key beeminder-goals-mode-map (kbd "a")     #'beeminder-add-data-to-current-goal)
-  (define-key beeminder-goals-mode-map (kbd "d")     #'beeminder-view-data-for-current-goal)
-
-
-  ;; Font locking
-  )
+  (define-key beeminder-goals-mode-map (kbd "d")     #'beeminder-view-data-for-current-goal))
 
 ;;;###autoload
 (define-derived-mode beeminder-view-goal-mode beeminder-mode "Beeminder Goal"
@@ -539,20 +536,15 @@ goals that are derailed."
   ;; beeminder-view-goal-mode-map
   (define-key beeminder-view-goal-mode-map (kbd "a") #'beeminder-add-data-to-current-goal)
   (define-key beeminder-view-goal-mode-map (kbd "d") #'beeminder-view-data-for-current-goal)
+  (define-key beeminder-view-goal-mode-map (kbd "g") #'beeminder-refresh-current-buffer)
 
   ;; Initialize buffer local variables.
   ;; TODO: Rename this to beeminder-buffer-goal?
-  (set (make-local-variable 'beeminder-goal) nil)
-
-  ;; Font locking
-  )
+  (set (make-local-variable 'beeminder-goal) nil))
 
 ;;;###autoload
 (define-derived-mode beeminder-view-goal-datapoints-mode beeminder-mode "Beeminder Goal Datapoints"
-  "Mode for viewing datapoints for a single beeminder goal."
-  ;; Font locking
-  )
-
+  "Mode for viewing datapoints for a single beeminder goal.")
 
 
 ;; --------------------------------------------------
