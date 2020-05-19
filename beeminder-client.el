@@ -352,7 +352,7 @@ goals that are derailed."
     (insert (format "%-22s " (assoc-default 'slug goal)))
     (insert (format "%-22s " (beeminder--goal-deadline-indicator goal)))
     (insert (format "%6s  "  (assoc-default 'amount (assoc-default 'contract goal))))
-    (insert (format "%11s"   (format-time-string "%Y-%m-%d %H:%M" (assoc-default 'goaldate goal))))
+    (insert (format "%11s"   (format-time-string "%Y-%m-%d %H:%M" (assoc-default 'losedate goal))))
 
     ;; Add goal slug as a text property so we can look it up later.
     (put-text-property (line-beginning-position)
