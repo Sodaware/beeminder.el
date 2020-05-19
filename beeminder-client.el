@@ -26,6 +26,7 @@
 ;; Dependencies
 
 (require 'beeminder)
+(require 'beeminder-client-faces)
 (require 'button)
 
 
@@ -188,8 +189,12 @@ GOAL must be an associative array of goal information from the API."
 
 (defun beeminder--insert-goal-recent-data-section (goal)
   "Insert recent datapoints for GOAL."
-  (insert "Recent data\n")
-  (insert "Date          Value     Comment\n")
+  (insert "Recent data\n\n")
+
+  (insert (propertize "Date          Value     Comment\n"
+                      'face 'beeminder-client-table-header))
+  (insert "\n")
+
   (if (null (assoc-default 'recent_data goal))
       (insert "No recent datapoints\n")
       (seq-doseq (datapoint (assoc-default 'recent_data goal))
@@ -253,16 +258,23 @@ for the beeminder-goals buffer."
 
 (defun beeminder--insert-active-goals (goals)
   "Insert active goals from GOALS into buffer."
-  (insert (format "Active Goals (%d)\n" (length goals)))
+  (insert (format (propertize "Active Goals (%s)"        'face 'beeminder-section-headline)
+                  (propertize (format "%d" (length goals)) 'face 'beeminder-section-counter)))
+
+  (insert "\n\n")
+
   (if goals
       (beeminder--insert-goal-table goals)
       (insert "No active goals")))
 
 (defun beeminder--goal-status-indicator (goal)
   "Generate indicator for GOAL."
+  ;; TODO: Propertizing should probably go where `insert` is used.
   (format "%s%s"
-          (beeminder--goal-indicator-rail  goal)
-          (beeminder--goal-indicator-fresh goal)))
+          (propertize (beeminder--goal-indicator-rail goal)
+                      'face (beeminder--goal-indicator-face goal))
+          (propertize (beeminder--goal-indicator-fresh goal)
+                      'face 'beeminder-indicator-fresh)))
 
 (defun beeminder--goal-indicator-rail (goal)
   "Get derailed or nearly-derailed status for GOAL."
@@ -271,6 +283,14 @@ for the beeminder-goals buffer."
    ((beeminder--goal-in-red-p    goal) " !!")
    ((beeminder--goal-in-orange-p goal) "  !")
    (t                                  "   ")))
+
+(defun beeminder--goal-indicator-face (goal)
+  "Get face to display GOAL indicator."
+  (cond
+   ((beeminder--goal-derailed-p  goal) 'beeminder-indicator-derailed)
+   ((beeminder--goal-in-red-p    goal) 'beeminder-indicator-in-red)
+   ((beeminder--goal-in-orange-p goal) 'beeminder-indicator-in-orange)
+   (t                                  'beeminder-indicator-in-clear)))
 
 (defun beeminder--goal-indicator-fresh (goal)
   "Get the fresh indicator for GOAL.
@@ -286,7 +306,7 @@ GOAL is fresh if it had data submitted today."
 Will return the deadline date for valid goals, or 'DERAILED' for
 goals that are derailed."
   (if (beeminder--goal-derailed-p goal)
-      "DERAILED"
+      (propertize "DERAILED" 'face 'beeminder-deadline-derailed)
       (assoc-default 'limsumdays goal)))
 
 (defun beeminder--goals-buffer-name ()
@@ -302,21 +322,21 @@ goals that are derailed."
   (format "beeminder goal datapoints: %s" (assoc-default 'slug goal)))
 
 (defun beeminder--insert-goal-table (goals)
-  "Generate text for a table of GOALS.
+  "Insert table of GOALS into the current buffer."
+  ;; Insert the table header.
+  (insert (propertize "     Goal                   Deadline               Pledge        Derails At"
+                      'face 'beeminder-client-table-header))
+  (insert "\n")
 
-GOALS must contain valid goal data."
-  ;; Insert the header.
-  (insert "     Goal                   Deadline               Pledge        Derails At\n")
-
+  ;; Insert all goals.
   (seq-doseq (goal goals)
-    ;; Insert the goal
     (insert (format "%4s "   (beeminder--goal-status-indicator goal)))
     (insert (format "%-22s " (assoc-default 'title goal)))
     (insert (format "%-22s " (beeminder--goal-deadline-indicator goal)))
     (insert (format "%6s  "  (assoc-default 'amount (assoc-default 'contract goal))))
     (insert (format "%11s"   (format-time-string "%Y-%m-%d %H:%M" (assoc-default 'goaldate goal))))
 
-    ;; Add goal slug as a property so we can look it up later.
+    ;; Add goal slug as a text property so we can look it up later.
     (put-text-property (line-beginning-position)
                        (line-end-position)
                        'beeminder-goal-slug
@@ -326,7 +346,9 @@ GOALS must contain valid goal data."
 (defun beeminder--insert-datapoints-table (datapoints)
   "Insert a table for DATAPOINTS."
   ;; Insert the header.
-  (insert "Date       Goal  Value  Comment  Date Entered\n")
+  (insert (propertize "Date       Goal  Value  Comment  Date Entered"
+                      'face 'beeminder-client-table-header))
+  (insert "\n")
 
   ;; Insert each datapoint.
   (seq-doseq (datapoint datapoints)
@@ -471,8 +493,8 @@ GOALS must contain valid goal data."
 (define-derived-mode beeminder-mode special-mode "Beeminder"
   "Base mode which other Beeminder modes inherit."
   :group 'beeminder-modes
-  (define-key beeminder-mode-map (kbd "g") #'beeminder-refresh-current-buffer)
   (buffer-disable-undo)
+  ;; All beeminder modes are read-only by default.
   (setq buffer-read-only t
         truncate-lines t
         show-trailing-whitespace nil))
