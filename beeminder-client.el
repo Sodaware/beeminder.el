@@ -53,7 +53,7 @@
          (with-current-buffer (generate-new-buffer ,buffer-name)
            (progn ,@body)
            (switch-to-buffer (get-buffer ,buffer-name))
-           (beginning-of-buffer)))))
+           (goto-char (point-min))))))
 
 
 ;; --------------------------------------------------
