@@ -503,6 +503,9 @@ goals that are derailed."
   (or (get-text-property (point) 'beeminder-goal-slug)
       (assoc-default 'slug beeminder-goal)))
 
+(defun beeminder-client--display-configuration-error ()
+  "Display an error message that the extension has not been configured."
+  (error "Please set beeminder-username and beeminder-auth-token variables before using"))
 
 ;; --------------------------------------------------
 ;; -- Mode Definitions
