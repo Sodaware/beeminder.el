@@ -62,7 +62,8 @@
   (with-mock
    (stub beeminder--initialize-goals-buffer)
    (stub beeminder-goals-mode)
-   (let ((beeminder-username "test_user"))
+   (let ((beeminder-username   "test_user")
+         (beeminder-auth-token "ABCDEF"))
      (should-not (get-buffer "beeminder: test_user"))
      (beeminder-goals)
      (should (get-buffer "beeminder: test_user")))))
