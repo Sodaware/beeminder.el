@@ -62,13 +62,12 @@
 (defun beeminder-goals ()
   "Display an interactive list of your current Beeminder goals."
   (interactive)
-  (if (beeminder-configured-p)
-      (beeminder--create-or-switch-to-buffer
-       (beeminder--goals-buffer-name)
-       (progn
-         (beeminder--initialize-goals-buffer)
-         (beeminder-goals-mode)))
-      (beeminder-client--display-configuration-error)))
+  (beeminder-client--require-configuration)
+  (beeminder--create-or-switch-to-buffer
+   (beeminder--goals-buffer-name)
+   (progn
+     (beeminder--initialize-goals-buffer)
+     (beeminder-goals-mode))))
 
 
 ;; --------------------------------------------------
@@ -504,10 +503,11 @@ goals that are derailed."
   "Get the goal slug for either the current buffer or goal at point."
   (or (get-text-property (point) 'beeminder-goal-slug)
       (assoc-default 'slug beeminder-goal)))
+(defun beeminder-client--require-configuration ()
+  "Display an error message if beeminder.el is not configured."
+  (unless (beeminder-configured-p)
+    (error "Please set `beeminder-username` and `beeminder-auth-token` variables before using")))
 
-(defun beeminder-client--display-configuration-error ()
-  "Display an error message that the extension has not been configured."
-  (error "Please set beeminder-username and beeminder-auth-token variables before using"))
 
 ;; --------------------------------------------------
 ;; -- Mode Definitions
