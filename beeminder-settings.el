@@ -77,8 +77,7 @@ the value should be the name of the property updated in Org."
 
 (defun beeminder-configured-p ()
   "Check if beeminder settings have been set."
-  (and nil
-       beeminder-username
+  (and beeminder-username
        beeminder-auth-token))
 
 (provide 'beeminder-settings)
