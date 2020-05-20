@@ -40,6 +40,9 @@
   :type 'string
   :group 'beeminder)
 
+(defvar beeminder-buffer-goal nil
+  "The goal being viewed in the current beeminder-goal buffer.")
+
 
 ;; --------------------------------------------------
 ;; -- Utility Macros
@@ -82,7 +85,7 @@
      (progn
        (beeminder--initialize-goal-buffer goal)
        (beeminder-view-goal-mode)
-       (set (make-local-variable 'beeminder-goal) goal)))))
+       (set (make-local-variable 'beeminder-buffer-goal) goal)))))
 
 
 ;; --------------------------------------------------
@@ -97,7 +100,7 @@
      (progn
        (beeminder--initialize-goal-datapoints-buffer goal)
        (beeminder-view-goal-datapoints-mode)
-       (set (make-local-variable 'beeminder-goal) goal)))))
+       (set (make-local-variable 'beeminder-buffer-goal) goal)))))
 
 
 ;; --------------------------------------------------
@@ -460,12 +463,12 @@ goals that are derailed."
   "Refresh the current goal buffer."
   ;; Store the buffer goal as it's a local variable that gets cleared when
   ;; calling `erase-buffer`.
-  (let ((current-goal beeminder-goal))
+  (let ((current-goal beeminder-buffer-goal))
     (setq buffer-read-only nil)
     (erase-buffer)
     (beeminder--initialize-goal-buffer current-goal)
     (beeminder-view-goal-mode)
-    (set (make-local-variable 'beeminder-goal) current-goal)))
+    (set (make-local-variable 'beeminder-buffer-goal) current-goal)))
 
 (defun beeminder--refresh-goal-datapoints-buffer ()
   "Refresh the current goal datapoints buffer."
@@ -502,7 +505,8 @@ goals that are derailed."
 (defun beeminder--guess-current-goal ()
   "Get the goal slug for either the current buffer or goal at point."
   (or (get-text-property (point) 'beeminder-goal-slug)
-      (assoc-default 'slug beeminder-goal)))
+      (assoc-default 'slug beeminder-buffer-goal)))
+
 (defun beeminder-client--require-configuration ()
   "Display an error message if beeminder.el is not configured."
   (unless (beeminder-configured-p)
@@ -544,8 +548,7 @@ goals that are derailed."
   (define-key beeminder-view-goal-mode-map (kbd "g") #'beeminder-refresh-current-buffer)
 
   ;; Initialize buffer local variables.
-  ;; TODO: Rename this to beeminder-buffer-goal?
-  (set (make-local-variable 'beeminder-goal) nil))
+  (set (make-local-variable 'beeminder-buffer-goal) nil))
 
 ;;;###autoload
 (define-derived-mode beeminder-view-goal-datapoints-mode beeminder-mode "Beeminder Goal Datapoints"
