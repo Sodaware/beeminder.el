@@ -62,11 +62,13 @@
 (defun beeminder-goals ()
   "Display an interactive list of your current Beeminder goals."
   (interactive)
-  (beeminder--create-or-switch-to-buffer
-   (beeminder--goals-buffer-name)
-   (progn
-     (beeminder--initialize-goals-buffer)
-     (beeminder-goals-mode))))
+  (if (beeminder-configured-p)
+      (beeminder--create-or-switch-to-buffer
+       (beeminder--goals-buffer-name)
+       (progn
+         (beeminder--initialize-goals-buffer)
+         (beeminder-goals-mode)))
+      (beeminder-client--display-configuration-error)))
 
 
 ;; --------------------------------------------------
