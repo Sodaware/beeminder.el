@@ -59,8 +59,9 @@
 
 
 ;; --------------------------------------------------
-;; -- Goal list
+;; -- Main client functions
 
+;;;###autoload
 (defun beeminder-goals ()
   "Display an interactive list of your current Beeminder goals."
   (interactive)
@@ -71,35 +72,31 @@
      (beeminder--initialize-goals-buffer)
      (beeminder-goals-mode))))
 
-
-;; --------------------------------------------------
-;; -- Goal details page
-
+;;;###autoload
 (defun beeminder-view-goal (goal-name)
   "Display a page detailing GOAL-NAME."
   (interactive "MGoal: ")
+  (beeminder-client--require-configuration)
   (let ((goal (beeminder-get-user-goal beeminder-username goal-name)))
     (beeminder--create-or-switch-to-buffer
      (beeminder--goal-buffer-name goal)
      (progn
        (beeminder--initialize-goal-buffer goal)
        (beeminder-view-goal-mode)
-       (set (make-local-variable 'beeminder-buffer-goal) goal)))))
+       (beeminder-client--store-buffer-goal goal)))))
 
-
-;; --------------------------------------------------
-;; -- Goal datapoints page
-
+;;;###autoload
 (defun beeminder-view-goal-datapoints (goal-name)
   "Display a page showing datapoints for GOAL-NAME."
   (interactive "MGoal: ")
+  (beeminder-client--require-configuration)
   (let ((goal (beeminder-get-user-goal beeminder-username goal-name)))
     (beeminder--create-or-switch-to-buffer
      (beeminder--goal-datapoints-buffer-name goal)
      (progn
        (beeminder--initialize-goal-datapoints-buffer goal)
        (beeminder-view-goal-datapoints-mode)
-       (set (make-local-variable 'beeminder-buffer-goal) goal)))))
+       (beeminder-client--store-buffer-goal goal)))))
 
 
 ;; --------------------------------------------------
@@ -429,6 +426,7 @@ goals that are derailed."
               (beeminder-fetch-goals beeminder-username)
               "\n")))
 
+
 ;; --------------------------------------------------
 ;; -- Goal helpers
 
@@ -467,7 +465,7 @@ goals that are derailed."
     (erase-buffer)
     (beeminder--initialize-goal-buffer current-goal)
     (beeminder-view-goal-mode)
-    (set (make-local-variable 'beeminder-buffer-goal) current-goal)))
+    (beeminder-client--store-buffer-goal current-goal)))
 
 (defun beeminder--refresh-goal-datapoints-buffer ()
   "Refresh the current goal datapoints buffer."
@@ -505,6 +503,10 @@ goals that are derailed."
   "Get the goal slug for either the current buffer or goal at point."
   (or (get-text-property (point) 'beeminder-goal-slug)
       (assoc-default 'slug beeminder-buffer-goal)))
+
+(defun beeminder-client--store-buffer-goal (goal)
+  "Store GOAL in a local variable for the current buffer."
+  (set (make-local-variable 'beeminder-buffer-goal) goal))
 
 (defun beeminder-client--require-configuration ()
   "Display an error message if beeminder.el is not configured."
@@ -547,7 +549,7 @@ goals that are derailed."
   (define-key beeminder-view-goal-mode-map (kbd "g") #'beeminder-refresh-current-buffer)
 
   ;; Initialize buffer local variables.
-  (set (make-local-variable 'beeminder-buffer-goal) nil))
+  (beeminder-client--store-buffer-goal nil))
 
 ;;;###autoload
 (define-derived-mode beeminder-view-goal-datapoints-mode beeminder-mode "Beeminder Goal Datapoints"
