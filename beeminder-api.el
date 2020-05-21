@@ -75,10 +75,7 @@
 
 (defun beeminder-fetch-goals (&optional username)
   "Fetch a list of all goals for the global user, or USERNAME if supplied."
-  (let ((user (or username beeminder-username)))
-    (beeminder--get (beeminder--create-endpoint
-                     (format "users/%s/goals" user)
-                     (list :auth_token beeminder-auth-token)))))
+  (beeminder-get-user-goals (or username beeminder-username)))
 
 (defun beeminder-refresh-goal-graph (username goal)
   "Force a refresh of the USERNAME's GOAL graph."
