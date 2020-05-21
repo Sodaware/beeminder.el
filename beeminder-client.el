@@ -392,6 +392,7 @@ goals that are derailed."
 ;; --------------------------------------------------
 ;; -- Legacy interactive functions.
 
+;;;###autoload
 (defun beeminder-add-data (goal value comment)
   "Update Beeminder GOAL with VALUE and COMMENT."
   (interactive "MGoal: \nnValue: \nMComment: \n")
