@@ -117,6 +117,14 @@ the user their current pledge level."
 
 
 ;; --------------------------------------------------
+;; -- Deprecated functions
+
+(defun beeminder-fetch-goal (username goal)
+  "Fetch data for USERNAME's GOAL."
+  (beeminder-get-user-goal username goal))
+
+
+;; --------------------------------------------------
 ;; -- Goal helpers
 
 (defun beeminder--goal-derailed-p (goal)
@@ -207,7 +215,6 @@ For example (:key value :other-key value) will generate the following string:
   "Check if RESULT is valid."
   (not (beeminder--api-error-p result)))
 
-;;;###autoload
 (defun beeminder--get (url)
   "Perform a GET request to URL."
   (with-current-buffer (url-retrieve-synchronously url)
@@ -216,7 +223,6 @@ For example (:key value :other-key value) will generate the following string:
     (prog1 (json-read)
       (kill-buffer))))
 
-;;;###autoload
 (defun beeminder--post (url args)
   "Perform a POST request to URL with ARGS."
   (let ((url-request-method "POST")

@@ -555,14 +555,5 @@ goals that are derailed."
 (define-derived-mode beeminder-view-goal-datapoints-mode beeminder-mode "Beeminder Goal Datapoints"
   "Mode for viewing datapoints for a single beeminder goal.")
 
-
-;; --------------------------------------------------
-;; -- Deprecated functions
-
-(defun beeminder-fetch-goal (username goal)
-  "Fetch data for USERNAME's GOAL."
-  (beeminder-get-user-goal username goal))
-
-
 (provide 'beeminder-client)
 ;;; beeminder-client.el ends here
