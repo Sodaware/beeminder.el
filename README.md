@@ -45,18 +45,31 @@ different, but the basic outline is this:
     To set it in Emacs, add the following code (or use `M-x customize`):
 
 ```lisp
-(setq beeminder-username "username")
-(setq beeminder-auth-token "token")
+(setq beeminder-username   "username"
+      beeminder-auth-token "token")
 ```
 
   - Set up your keyboard shortcuts.  Here are some recommendations:
 
 ```lisp
-(global-set-key "\C-cba" 'beeminder-add-data)
-(global-set-key "\C-cbw" 'beeminder-whoami)
-(global-set-key "\C-cbg" 'beeminder-my-goals-org)
-(global-set-key "\C-cbr" 'beeminder-refresh-goal)
-(global-set-key "\C-cbt" 'beeminder-submit-clocked-time)
+(global-set-key "\C-cba" #'beeminder-add-data)
+(global-set-key "\C-cbw" #'beeminder-whoami)
+(global-set-key "\C-cbg" #'beeminder-my-goals-org)
+(global-set-key "\C-cbr" #'beeminder-refresh-goal)
+(global-set-key "\C-cbt" #'beeminder-submit-clocked-time)
+```
+
+The same setup for `use-package` looks like this:
+
+```lisp
+(use-package beeminder
+   :after (org)
+   :bind
+   (("C-c b a" . beeminder-add-data)
+    ("C-c b g" . beeminder-goals)
+    ("C-c b i" . beeminder-my-goals-org)
+    ("C-c b r" . beeminder-refresh-goal)
+    ("C-c b w" . beeminder-whoami)))
 ```
 
 The recommended settings above will add the following keyboard shortcuts:
