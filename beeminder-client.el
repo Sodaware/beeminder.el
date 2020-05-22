@@ -106,20 +106,13 @@
   "Initialize buffer for viewing GOAL.
 
 GOAL must be an associative array of goal information from the API."
-  ;; Insert goal header information.
-  (insert (format "%s (%s/%s)\n\n"
-                  (assoc-default 'title goal)
-                  beeminder-username
-                  (assoc-default 'slug goal)))
-  ;; TODO: Replace these with a helper?
-  (when (assoc-default 'description goal)
-    (insert (format "%s\n" (assoc-default 'description goal))))
-  (when (assoc-default 'fineprint goal)
-    (insert (format "%s\n" (assoc-default 'fineprint goal))))
-
+  (beeminder-client--insert-goal-identifier goal)
+  (beeminder-client--insert-optional-field goal 'description)
+  (beeminder-client--insert-optional-field goal 'fineprint)
   (insert "\n")
 
   ;; Insert sections.
+  ;; TODO: These should be configurable, and possibly per-goal.
   (beeminder--insert-goal-progress-section goal)
   (beeminder--insert-goal-amounts-section goal)
   (beeminder--insert-goal-statistics-section goal)
@@ -194,6 +187,7 @@ GOAL must be an associative array of goal information from the API."
   (beeminder--insert-section-heading "Recent data")
   (insert "\n")
 
+  ;; TODO: Use insert table
   (insert (propertize "Date          Value     Comment"
                       'face 'beeminder-client-table-header))
   (insert "\n")
@@ -224,27 +218,6 @@ GOAL must be an associative array of goal information from the API."
 
 ;; --------------------------------------------------
 ;; -- Goal datapoints - Internals
-
-(defun beeminder--insert-table-heading (header &optional width face)
-  "Insert and style a table heading with text HEADER at current point.
-
-If WIDTH is passed, will left-justify the headline to that size.
-Pass FACE to override the default table face name."
-  (let* ((width  (or width (length header)))
-         (face   (or face  'beeminder-client-table-header))
-         (header (concat header (make-string (- width (length header)) ?\s))))
-    (insert (propertize header 'face face))
-    (insert "\n")))
-
-(defun beeminder--insert-section-heading (heading &optional counter)
-  "Insert a section HEADING with optional COUNTER in brackets."
-  (insert (propertize heading 'face 'beeminder-section-headline))
-
-  (when counter
-    (insert (format (propertize " (%s)" 'face 'beeminder-section-headline)
-                    (propertize (format "%d" counter) 'face 'beeminder-section-counter))))
-
-  (insert "\n"))
 
 (defun beeminder--initialize-goal-datapoints-buffer (goal)
   "Initialize buffer for viewing GOAL."
@@ -504,6 +477,43 @@ goals that are derailed."
   "Get the goal slug for either the current buffer or goal at point."
   (or (get-text-property (point) 'beeminder-goal-slug)
       (assoc-default 'slug beeminder-buffer-goal)))
+
+
+;; --------------------------------------------------
+;; -- Text insertion helpers
+
+(defun beeminder--insert-table-heading (header &optional width face)
+  "Insert and style a table heading with text HEADER at current point.
+
+If WIDTH is passed, will left-justify the headline to that size.
+Pass FACE to override the default table face name."
+  (let* ((width  (or width (length header)))
+         (face   (or face  'beeminder-client-table-header))
+         (header (concat header (make-string (- width (length header)) ?\s))))
+    (insert (propertize header 'face face))
+    (insert "\n")))
+
+(defun beeminder--insert-section-heading (heading &optional counter)
+  "Insert a section HEADING with optional COUNTER in brackets."
+  (insert (propertize heading 'face 'beeminder-section-headline))
+
+  (when counter
+    (insert (format (propertize " (%s)" 'face 'beeminder-section-headline)
+                    (propertize (format "%d" counter) 'face 'beeminder-section-counter))))
+
+  (insert "\n"))
+
+(defun beeminder-client--insert-goal-identifier (goal)
+  "Insert the identifier (title, username and slug) for GOAL, followed by two newlines."
+  (insert (format "%s (%s/%s)\n\n"
+                  (assoc-default 'title goal)
+                  beeminder-username
+                  (assoc-default 'slug goal))))
+
+(defun beeminder-client--insert-optional-field (goal field)
+  "Insert optional GOAL FIELD followed by a newline."
+  (when (assoc-default field goal)
+    (insert (format "%s\n" (assoc-default field goal)))))
 
 (defun beeminder-client--store-buffer-goal (goal)
   "Store GOAL in a local variable for the current buffer."
