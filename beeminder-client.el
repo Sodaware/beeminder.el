@@ -140,7 +140,8 @@ GOAL must be an associative array of goal information from the API."
   ;; TODO: Third line ("<day>") should be green
 
   (beeminder--insert-section-heading "Amounts due by day")
-  (insert "Day          Delta    Total\n")
+  ;; TODO: Fix width here.
+  (beeminder--insert-table-heading "Day          Delta    Total")
   (insert (beeminder--format-goal-amount 0 goal))
   (insert (beeminder--format-goal-amount 1 goal))
   (insert (beeminder--format-goal-amount 2 goal))
@@ -187,10 +188,7 @@ GOAL must be an associative array of goal information from the API."
   (beeminder--insert-section-heading "Recent data")
   (insert "\n")
 
-  ;; TODO: Use insert table
-  (insert (propertize "Date          Value     Comment"
-                      'face 'beeminder-client-table-header))
-  (insert "\n")
+  (beeminder--insert-table-heading "Date          Value     Comment")
 
   (if (null (assoc-default 'recent_data goal))
       (insert "No recent datapoints\n")
@@ -221,12 +219,7 @@ GOAL must be an associative array of goal information from the API."
 
 (defun beeminder--initialize-goal-datapoints-buffer (goal)
   "Initialize buffer for viewing GOAL."
-  ;; Insert goal header information.
-  (insert (format "%s (%s/%s)\n\n"
-                  (assoc-default 'title goal)
-                  beeminder-username
-                  (assoc-default 'slug goal)))
-
+  (beeminder-client--insert-goal-identifier goal)
   (beeminder--insert-table-heading "Date          Value     Comment" 80)
 
   (if (null (assoc-default 'recent_data goal))
