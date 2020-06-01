@@ -36,7 +36,13 @@
 (defcustom beeminder-client-fresh-indicator
   "✓"
   "Symbol that is displayed for fresh goals."
-  :type 'string
+  :type '(string)
+  :group 'beeminder)
+
+(defcustom beeminder-client-datapoints-per-page
+  10
+  "The number of datapoints to show per page."
+  :type '(integer)
   :group 'beeminder)
 
 (defvar beeminder-buffer-goal nil
@@ -222,14 +228,19 @@ GOAL must be an associative array of goal information from the API."
   (beeminder-client--insert-goal-identifier goal)
   (beeminder--insert-table-heading "Date          Value     Comment" 80)
 
-  (if (null (assoc-default 'recent_data goal))
-      (insert "No recent datapoints\n")
-      (seq-doseq (datapoint (assoc-default 'recent_data goal))
-        (insert (format "%-10s " (beeminder--format-daystamp (assoc-default 'daystamp datapoint))))
-        (insert (format "%8s "   (assoc-default 'value datapoint)))
-        (insert "    ")
-        (insert (assoc-default 'comment datapoint))
-        (insert "\n"))))
+  ;; Fetch and display datapoints.
+  ;; TODO: This is ugly.
+  (let ((datapoints (beeminder-get-datapoints beeminder-username
+                                              (assoc-default 'slug goal)
+                                              (list :per beeminder-client-datapoints-per-page))))
+    (if (or (null datapoints) (= 0 (length datapoints)))
+        (insert "No recent datapoints\n")
+        (seq-doseq (datapoint datapoints)
+          (insert (format "%-10s " (beeminder--format-daystamp (assoc-default 'daystamp datapoint))))
+          (insert (format "%8s "   (assoc-default 'value datapoint)))
+          (insert "    ")
+          (insert (assoc-default 'comment datapoint))
+          (insert "\n")))))
 
 
 ;; --------------------------------------------------

@@ -52,7 +52,10 @@
 
 
 (defmacro mock-expected-get (path)
-  (let ((uri (format "%s/%s?auth_token=ABCDEF" "https://www.beeminder.com/api/v1" path)))
+  (let ((uri (format "%s/%s%sauth_token=ABCDEF"
+                     "https://www.beeminder.com/api/v1"
+                     path
+                     (if (string-match-p "\\?" path) "&" "?"))))
     `(mock (beeminder--get ,uri) => t)))
 
 (defmacro mock-get (path fixture)

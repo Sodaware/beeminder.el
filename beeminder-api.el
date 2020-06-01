@@ -110,10 +110,22 @@ the user their current pledge level."
 ;; --------------------------------------------------
 ;; -- API endpoints - datapoints
 
-(defun beeminder-get-datapoints (username goal)
-  "Get the list of datapoints for USERNAME's GOAL."
+(defun beeminder-get-datapoints (username goal &optional options)
+  "Get the list of datapoints for USERNAME's GOAL.
+
+If passed, OPTIONS must be an property list with one or more of the following
+properties:
+- :sort  - Which attribute to sort on.  Defaults to `id` if none given.
+- :count - Limit results to `count` number of datapoints.  Defaults to all
+           datapoints if parameter is missing.
+- :page  - The page of results to return.
+- :per   - Number of results per page.  Default 25.  Ignored without page
+           parameter."
   (beeminder--get (beeminder--create-endpoint
-                   (format "users/%s/goals/%s/datapoints" username goal))))
+                   (format "users/%s/goals/%s/datapoints" username goal)
+                   (append
+                    (beeminder--filter-options options (list :sort :count :page :per))
+                    (list :auth_token beeminder-auth-token)))))
 
 
 ;; --------------------------------------------------

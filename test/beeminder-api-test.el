@@ -7,7 +7,7 @@
 ;;; Code:
 
 ;; --------------------------------------------------
-;; -- ;; beeminder-user-info
+;; -- beeminder-user-info
 
 (ert-deftest beeminder-api-test/beeminder-user-info-returns-alist ()
   (let ((beeminder-auth-token "ABCDEF"))
@@ -47,6 +47,40 @@
     (with-mock
      (mock-expected-get "users/GLOBAL-USERNAME/goals.json")
      (beeminder-fetch-goals))))
+
+
+;; --------------------------------------------------
+;; -- beeminder-get-datapoints
+
+(ert-deftest beeminder-api-test/get-datapoints-fetches-datapoints-for-user-goal ()
+  (let ((beeminder-auth-token "ABCDEF"))
+    (with-mock
+     (mock-expected-get "users/TEST_USERNAME/goals/TEST_GOAL/datapoints.json")
+     (beeminder-get-datapoints "TEST_USERNAME" "TEST_GOAL"))))
+
+(ert-deftest beeminder-api-test/get-datapoints-adds-count-parameter-if-present ()
+  (let ((beeminder-auth-token "ABCDEF"))
+    (with-mock
+     (mock-expected-get "users/TEST_USERNAME/goals/TEST_GOAL/datapoints.json?count=5")
+     (beeminder-get-datapoints "TEST_USERNAME" "TEST_GOAL" (list :count 5)))))
+
+(ert-deftest beeminder-api-test/get-datapoints-adds-page-parameter-if-present ()
+  (let ((beeminder-auth-token "ABCDEF"))
+    (with-mock
+     (mock-expected-get "users/TEST_USERNAME/goals/TEST_GOAL/datapoints.json?page=15")
+     (beeminder-get-datapoints "TEST_USERNAME" "TEST_GOAL" (list :page 15)))))
+
+(ert-deftest beeminder-api-test/get-datapoints-adds-per-parameter-if-present ()
+  (let ((beeminder-auth-token "ABCDEF"))
+    (with-mock
+     (mock-expected-get "users/TEST_USERNAME/goals/TEST_GOAL/datapoints.json?per=20")
+     (beeminder-get-datapoints "TEST_USERNAME" "TEST_GOAL" (list :per 20)))))
+
+(ert-deftest beeminder-api-test/get-datapoints-adds-sort-parameter-if-present ()
+  (let ((beeminder-auth-token "ABCDEF"))
+    (with-mock
+     (mock-expected-get "users/TEST_USERNAME/goals/TEST_GOAL/datapoints.json?sort=value")
+     (beeminder-get-datapoints "TEST_USERNAME" "TEST_GOAL" (list :sort "value")))))
 
 
 ;; --------------------------------------------------
