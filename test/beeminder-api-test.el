@@ -90,6 +90,18 @@
 
 
 ;; --------------------------------------------------
+;; -- beeminder--filter-options
+
+(ert-deftest beeminder-api-test/filter-options-does-not-remove-valid-keys ()
+  (let ((test-data '((one . 1) (two . 2) (three . 3))))
+    (should (equal test-data (beeminder--filter-options test-data '(one two three))))))
+
+(ert-deftest beeminder-api-test/filter-options-removes-invalid-keys ()
+  (let ((test-data '((one . 1) (two . 2) (three . 3))))
+    (should (equal '((three . 3)) (beeminder--filter-options test-data '(three))))))
+
+
+;; --------------------------------------------------
 ;; -- beeminder--build-query
 
 (ert-deftest beeminder-api-test/can-build-query-from-list ()

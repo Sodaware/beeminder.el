@@ -187,6 +187,13 @@ For example (:key value :other-key value) will generate the following string:
                      (setq query-string (format "%s%s&" query-string var))))
                (concat "?" (substring query-string 0 -1))))))
 
+(defun beeminder--filter-options (options allowed)
+  "Filter association list OPTIONS to online include ALLOWED keys."
+  (seq-filter
+   (lambda (pair)
+     (member (car pair) allowed))
+   options))
+
 
 ;; --------------------------------------------------
 ;; -- Request Helpers
