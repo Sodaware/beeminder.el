@@ -93,12 +93,12 @@
 ;; -- beeminder--filter-options
 
 (ert-deftest beeminder-api-test/filter-options-does-not-remove-valid-keys ()
-  (let ((test-data '((one . 1) (two . 2) (three . 3))))
-    (should (equal test-data (beeminder--filter-options test-data '(one two three))))))
+  (let ((test-data (list :one 1 :two 2 :three 3)))
+    (should (equal test-data (beeminder--filter-options test-data (list :one :two :three))))))
 
 (ert-deftest beeminder-api-test/filter-options-removes-invalid-keys ()
-  (let ((test-data '((one . 1) (two . 2) (three . 3))))
-    (should (equal '((three . 3)) (beeminder--filter-options test-data '(three))))))
+  (let ((test-data (list :one 1 :two 2 :three 3)))
+    (should (equal (list :three 3) (beeminder--filter-options test-data (list :three))))))
 
 
 ;; --------------------------------------------------

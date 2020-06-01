@@ -188,11 +188,16 @@ For example (:key value :other-key value) will generate the following string:
                (concat "?" (substring query-string 0 -1))))))
 
 (defun beeminder--filter-options (options allowed)
-  "Filter association list OPTIONS to online include ALLOWED keys."
-  (seq-filter
-   (lambda (pair)
-     (member (car pair) allowed))
-   options))
+  "Filter a symbol and values list OPTIONS to online include ALLOWED symbols.
+
+For example, filtering (:key value :other-key value) with allowed
+list of (:key) will return (:key value)."
+  (let ((filtered-list))
+    (dolist (key allowed)
+      (when (plist-member options key)
+        (setq filtered-list
+              (plist-put filtered-list key (plist-get options key)))))
+    filtered-list))
 
 
 ;; --------------------------------------------------
