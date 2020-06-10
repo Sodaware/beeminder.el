@@ -139,16 +139,13 @@ Here's an example:
 When "Write documentation" is changed to "DONE", a value of "1" will be submitted to the
 "beeminder-el" goal with "Write documentation" as the comment.
 
-A headlines properties will be updated with data from beeminder.com once it is
-closed. For habit goals, all properties **except** `beeminder-value` are
-updated. This can be changed via the `beeminder-excluded-habit-sync-properties`
-variable.
-
-For example, setting it to an empty list will synchronize `beeminder-value` with
-the beeminder value.
+A headline's properties will be updated with data from beeminder.com once it is
+closed. For org-mode habit headlines (i.e. headlines with their `style` property
+set to `habit`), all properties **except** `beeminder-value` are updated. This
+can be changed via the `beeminder-excluded-habit-sync-properties` variable.
 
 ```lisp
-;; Synchronize ALL properties of the habit when closed.
+;; Synchronize ALL properties of the habit when closed, including the value.
 (setq beeminder-excluded-habit-sync-properties '())
 
 ;; Prevent target value from being synced.
