@@ -18,6 +18,7 @@
     (let ((org-state nil)) ;; Set org-state as we're manually calling the hook
       (beeminder--on-org-task-completed)))))
 
+;; It does nothing if the completed task does not link to beeminder.
 (ert-deftest beeminder-org-test/on-task-completed-ignores-none-beeminder-tasks ()
   (with-org-mode-test
    "none_beeminder.org"
@@ -27,8 +28,7 @@
     (let ((org-state "DONE")) ;; Set org-state as we're manually calling the hook
       (beeminder--on-org-task-completed)))))
 
-;; Test:
-;; - It sets the datapoint to 1 if `beeminder-value` property not set.
+;; It sets the datapoint to 1 if `beeminder-value` property not set.
 (ert-deftest beeminder-org-test/on-task-completed-sets-datapoint-to-1-if-no-value ()
   (with-org-mode-test
    "beeminder_task.org"
@@ -40,7 +40,7 @@
       (stub beeminder-refresh-goal)
       (beeminder--on-org-task-completed)))))
 
-;; - It sets the datapoint to `beeminder-value` if property set
+;; It sets the datapoint to `beeminder-value` if property set.
 (ert-deftest beeminder-org-test/on-task-completed-sets-datapoint-to-value-if-present ()
   (with-org-mode-test
    "beeminder_task.org"
@@ -53,7 +53,7 @@
       (org-entry-put (point) "beeminder-value" "test_value")
       (beeminder--on-org-task-completed)))))
 
-;; - It sets the datapont to `time worked today` if value == `time-today`
+;; It sets the datapont to `time worked today` if value == `time-today`
 (ert-deftest beeminder-org-test/on-task-completed-sets-datapoint-to-time-worked-if-configured ()
   (with-org-mode-test
    "beeminder_task.org"
