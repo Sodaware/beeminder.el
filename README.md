@@ -70,7 +70,7 @@ and inserts them as a list of org-mode headlines.
 `C-c b w` (`beeminder-whoami`) - Fetches your username from Beeminder.
 
 `C-c b t` (`beeminder-submit-clocked-time`) - Submits clocked time for the
-current goal (and any of its sub-tasks). 
+current goal (and any of its sub-tasks).
 
 
 ## Usage
@@ -138,3 +138,19 @@ Here's an example:
 
 When "Write documentation" is changed to "DONE", a value of "1" will be submitted to the
 "beeminder-el" goal with "Write documentation" as the comment.
+
+A headlines properties will be updated with data from beeminder.com once it is
+closed. For habit goals, all properties **except** `beeminder-value` are
+updated. This can be changed via the `beeminder-excluded-habit-sync-properties`
+variable.
+
+For example, setting it to an empty list will synchronize `beeminder-value` with
+the beeminder value.
+
+```lisp
+;; Synchronize ALL properties of the habit when closed.
+(setq beeminder-excluded-habit-sync-properties '())
+
+;; Prevent target value from being synced.
+(setq beeminder-excluded-habit-sync-properties '("beeminder-target"))
+```
