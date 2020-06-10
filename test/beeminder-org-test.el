@@ -130,8 +130,8 @@
      (with-mock
       (mock-get "users/example/goals/example_goal.json" "example_goal.json")
       (beeminder-refresh-goal)
-      (should-not (string= (org-entry-get (point) "DEADLINE") "2020-01-01 Wed"))
-      (should     (string= (org-entry-get (point) "DEADLINE") "2015-04-09 Thu 02:59"))))))
+      (should-not (string= (org-entry-get (point) "DEADLINE") "<2020-01-01 Wed>"))
+      (should     (string= (org-entry-get (point) "DEADLINE") "<2015-04-09 Thu 02:59>"))))))
 
 (ert-deftest beeminder-org-test/refresh-goal-skips-deadline-update-if-configured ()
   (with-org-mode-test
@@ -142,8 +142,8 @@
       (mock-get "users/example/goals/example_goal.json" "example_goal.json")
       (org-entry-put (point) "beeminder-skip-deadlines" "skip")
       (beeminder-refresh-goal)
-      (should     (string= (org-entry-get (point) "DEADLINE") "2020-01-01 Wed"))
-      (should-not (string= (org-entry-get (point) "DEADLINE") "2015-04-09 Thu 02:59"))))))
+      (should     (string= (org-entry-get (point) "DEADLINE") "<2020-01-01 Wed>"))
+      (should-not (string= (org-entry-get (point) "DEADLINE") "<2015-04-09 Thu 02:59>"))))))
 
 (ert-deftest beeminder-org-test/refresh-goal-updates-all-beeminder-properties ()
   (with-org-mode-test
@@ -160,6 +160,30 @@
       (should (string= "307535"       (org-entry-get (point) "beeminder-lane")))
       (should (string= "44"           (org-entry-get (point) "beeminder-value")))
       (should (string= "1420619963"   (org-entry-get (point) "beeminder-updated-at")))))))
+
+(ert-deftest beeminder-org-test/refresh-goal-skips-habit-curval-by-default ()
+  (with-org-mode-test
+   "beeminder_habit.org"
+   (let ((beeminder-auth-token "ABCDEF")
+         (beeminder-username   "example"))
+     (with-mock
+      (mock-get "users/example/goals/example_goal.json" "example_goal.json")
+      (beeminder-refresh-goal)
+      ;; By default, should not synchronize the `curval` property for habits.
+      (should (eq nil (org-entry-get (point) "beeminder-value")))))))
+
+(ert-deftest beeminder-org-test/refresh-goal-skips-habit-properties-if-configured ()
+  (with-org-mode-test
+   "beeminder_habit.org"
+   (let ((beeminder-auth-token "ABCDEF")
+         (beeminder-username   "example")
+         (beeminder-excluded-habit-sync-properties '("beeminder-lane")))
+     (with-mock
+      (mock-get "users/example/goals/example_goal.json" "example_goal.json")
+      (beeminder-refresh-goal)
+      ;; Should sync the value, but not the lane.
+      (should (string= "44" (org-entry-get (point) "beeminder-value")))
+      (should (eq      nil  (org-entry-get (point) "beeminder-lane")))))))
 
 (ert-deftest beeminder-org-test/refresh-goal-recalculates-progress ()
   (with-org-mode-test

@@ -64,6 +64,13 @@ the value should be the name of the property updated in Org."
            (symbol "Symbol")
            (string "Property name"))))
 
+(defcustom beeminder-excluded-habit-sync-properties
+  '("beeminder-value")
+  "List of property names that should not change when an 'org-mode' habit headline is synchronized."
+  :group 'beeminder
+  :type '(repeat
+          (string "Property name")))
+
 (defun beeminder--org-property-name (symbol)
   "Get beeminder property name for SYMBOL."
   (assoc-default symbol beeminder-properties))

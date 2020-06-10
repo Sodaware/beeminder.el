@@ -203,11 +203,23 @@ If VALUE property set, use that as the data, otherwise return default value of 1
 (defun beeminder--org-update-properties (goal-data)
   "Update the current headline's properties from GOAL-DATA."
   (mapc (lambda (prop)
-          (when (assoc (car prop) goal-data)
+          (when (and (beeminder--can-sync-org-property-p (cdr prop))
+                     (assoc (car prop) goal-data))
             (org-entry-put (point)
                            (cdr prop)
                            (format "%s" (assoc-default (car prop) goal-data)))))
         beeminder-properties))
+
+(defun beeminder--can-sync-org-property-p (property-name)
+  "Check if PROPERTY-NAME can be synced in the current org headline.
+
+Prevents synchronization of certain properties when looking at a 'habit' goal."
+  (not (and (beeminder--org-current-headline-is-habit-p)
+            (member property-name beeminder-excluded-habit-sync-properties))))
+
+(defun beeminder--org-current-headline-is-habit-p ()
+  "Check if the current 'org-mode' headline is a habit."
+  (string= "habit" (org-entry-get (point) "STYLE" t)))
 
 (defun beeminder--org-update-completion-percentage (goal-data)
   "Update the current headline's completion percentage from GOAL-DATA."
