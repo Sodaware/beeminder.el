@@ -191,7 +191,7 @@ GOAL must be an associative array of goal information from the API."
 
 (defun beeminder--insert-goal-recent-data-section (goal)
   "Insert recent datapoints for GOAL."
-  (beeminder--insert-section-heading "Recent data" (assoc-default 'numpts goal))
+  (beeminder--insert-section-heading "Recent datapoints" (assoc-default 'numpts goal))
   (insert "\n")
 
   (beeminder--insert-table-heading "Date          Value     Comment")
