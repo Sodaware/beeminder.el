@@ -233,7 +233,7 @@ GOAL must be an associative array of goal information from the API."
   (let ((datapoints (beeminder-get-datapoints beeminder-username
                                               (assoc-default 'slug goal)
                                               (list :per beeminder-client-datapoints-per-page))))
-    (if (or (null datapoints) (= 0 (length datapoints)))
+    (if (= 0 (length datapoints))
         (insert "No recent datapoints\n")
         (seq-doseq (datapoint datapoints)
           (insert (format "%-10s " (beeminder--format-daystamp (assoc-default 'daystamp datapoint))))
