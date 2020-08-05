@@ -547,18 +547,23 @@ Pass FACE to override the default table face name."
   "Mode for browsing a list of beeminder goals."
   ;; beeminder-goals-mode-map
   ;; KEYMAP:
-  ;; g       -- refresh buffer
-  ;; <tab>   -- Open the current goal
+  ;; a       -- Prompt to add data for the highlighted goal.
+  ;; d       -- View datapoints for the highlighted goal.
+  ;; g       -- Reload data for all goals and refresh the table.
   ;; <enter> -- Go to goal detail page
   (define-key beeminder-goals-mode-map (kbd "<RET>") #'beeminder-visit-goal-at-point)
-  (define-key beeminder-goals-mode-map (kbd "g")     #'beeminder-refresh-current-buffer)
   (define-key beeminder-goals-mode-map (kbd "a")     #'beeminder-add-data-to-current-goal)
-  (define-key beeminder-goals-mode-map (kbd "d")     #'beeminder-view-data-for-current-goal))
+  (define-key beeminder-goals-mode-map (kbd "d")     #'beeminder-view-data-for-current-goal)
+  (define-key beeminder-goals-mode-map (kbd "g")     #'beeminder-refresh-current-buffer))
 
 ;;;###autoload
 (define-derived-mode beeminder-view-goal-mode beeminder-mode "Beeminder Goal"
   "Mode for viewing information about a single beeminder goal."
   ;; beeminder-view-goal-mode-map
+  ;; KEYMAP:
+  ;; a       -- Prompt to add data for the current goal.
+  ;; d       -- View datapoints for the current goal.
+  ;; g       -- Reload data for current goal.
   (define-key beeminder-view-goal-mode-map (kbd "a") #'beeminder-add-data-to-current-goal)
   (define-key beeminder-view-goal-mode-map (kbd "d") #'beeminder-view-data-for-current-goal)
   (define-key beeminder-view-goal-mode-map (kbd "g") #'beeminder-refresh-current-buffer)
