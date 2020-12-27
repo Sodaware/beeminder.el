@@ -6,7 +6,7 @@
 ;; Keywords: tools, beeminder
 ;; URL: http://www.philnewton.net/code/beeminder-el/
 ;; Created: March 22nd, 2014
-;; Version: 1.1.0
+;; Version: 1.2.0
 ;; Package-Requires: ((emacs "24.3") (seq "2.16") (org "7"))
 ;;
 ;; This file is NOT part of GNU Emacs.
