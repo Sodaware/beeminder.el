@@ -136,8 +136,8 @@ authorization token is set and valid.
 ### The goals buffer
 
 **beeminder.el** can browse your Beeminder goals directly from Emacs. Once your
-token has been configured, call `M-x beeminder-goals` to be open the goals
-buffer. It looks like this:
+authentication token has been configured, call `M-x beeminder-goals` to open the
+goals buffer. It looks like this:
 
 ![Viewing goals with
 beeminder.el](https://www.philnewton.net/assets/images/code/beeminder-el-all-goals.png)
