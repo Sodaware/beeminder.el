@@ -1,6 +1,6 @@
 ;;; beeminder-settings.el --- Settings for the beeminder extension. -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2014-2018 Phil Newton
+;; Copyright (C) 2014-2020 Phil Newton
 
 ;; Author: Phil Newton <phil@sodaware.net>
 
