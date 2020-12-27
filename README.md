@@ -53,10 +53,11 @@ different, but the basic outline is this:
 
 ```lisp
 (global-set-key "\C-cba" #'beeminder-add-data)
-(global-set-key "\C-cbw" #'beeminder-whoami)
-(global-set-key "\C-cbg" #'beeminder-my-goals-org)
+(global-set-key "\C-cbg" #'beeminder-goals)
+(global-set-key "\C-cbi" #'beeminder-my-goals-org)
 (global-set-key "\C-cbr" #'beeminder-refresh-goal)
 (global-set-key "\C-cbt" #'beeminder-submit-clocked-time)
+(global-set-key "\C-cbw" #'beeminder-whoami)
 ```
 
 The same setup for `use-package` looks like this:
