@@ -115,7 +115,7 @@ GOAL must be an associative array of goal information from the API."
   ;; TODO: These should be configurable, and possibly per-goal.
   (beeminder--insert-goal-progress-section goal)
   (beeminder--insert-goal-amounts-section goal)
-  (beeminder--insert-goal-statistics-section goal)
+  ;; (beeminder--insert-goal-statistics-section goal)
   (beeminder--insert-goal-recent-data-section goal))
 
 (defun beeminder--insert-goal-progress-section (goal)
