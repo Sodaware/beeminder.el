@@ -148,6 +148,7 @@ GOAL must be an associative array of goal information from the API."
   (insert "\n"))
 
 (defun beeminder--format-goal-amount (offset goal)
+  "Format amount line with OFFSET for GOAL."
   (format "%0-16s %s %s\n"
           (beeminder--format-goal-amount-day   offset)
           (beeminder--format-goal-amount-delta goal offset)
