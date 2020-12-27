@@ -446,7 +446,7 @@ goals that are derailed."
     (beeminder-client--store-buffer-goal current-goal)))
 
 (defun beeminder--refresh-goal-datapoints-buffer ()
-  "Refresh the current goal datapoints buffer."
+  "Clear and reload the current goal datapoints buffer."
   ;; TODO: Doesn't work
   (setq buffer-read-only nil)
   (erase-buffer)
@@ -470,7 +470,7 @@ goals that are derailed."
   (string= mode major-mode))
 
 (defun beeminder-view-data-for-current-goal ()
-  "Add VALUE with COMMENT to the currently viewed goal."
+  "View datapoints for the current goal."
   (interactive)
   (let ((current-goal (beeminder--guess-current-goal)))
     (if (string= "" current-goal)
@@ -573,7 +573,13 @@ Pass FACE to override the default table face name."
 
 ;;;###autoload
 (define-derived-mode beeminder-view-goal-datapoints-mode beeminder-mode "Beeminder Goal Datapoints"
-  "Mode for viewing datapoints for a single beeminder goal.")
+  "Mode for viewing datapoints for a single beeminder goal."
+  ;; beeminder-view-goal-datapoints-mode-map
+  ;; KEYMAP:
+  ;; +       -- Load more datapoints (if available).
+  ;; d       -- View datapoints for the current goal.
+  ;; g       -- Reload data for current goal.
+  (define-key beeminder-view-goal-datapoints-mode-map (kbd "+") #'beeminder-load-more-datapoints))
 
 (provide 'beeminder-client)
 ;;; beeminder-client.el ends here
