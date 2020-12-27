@@ -7,8 +7,8 @@
 |_.__/  \___| \___||_| |_| |_||_||_| |_| \__,_| \___||_|   (_) \___||_|
 ```
 
-[![Melpa Status](http://melpa.org/packages/beeminder-badge.svg)](http://melpa.org/#/beeminder)
-[![Melpa Stable Status](http://stable.melpa.org/packages/beeminder-badge.svg)](http://stable.melpa.org/#/beeminder)
+[![Melpa Status](https://melpa.org/packages/beeminder-badge.svg)](http://melpa.org/#/beeminder)
+[![Melpa Stable Status](https://stable.melpa.org/packages/beeminder-badge.svg)](http://stable.melpa.org/#/beeminder)
 
 
 A simple Emacs extension for working with [Beeminder](https://www.beeminder.com).
@@ -69,6 +69,7 @@ The same setup for `use-package` looks like this:
     ("C-c b g" . beeminder-goals)
     ("C-c b i" . beeminder-my-goals-org)
     ("C-c b r" . beeminder-refresh-goal)
+    ("C-c b t" . beeminder-submit-clocked-time)
     ("C-c b w" . beeminder-whoami)))
 ```
 
@@ -77,14 +78,20 @@ The recommended settings above will add the following keyboard shortcuts:
 `C-c b a` (`beeminder-add-data`) - Add data to a Beeminder goal.  Prompts for the
 goal identifier, a numeric value and an optional comment.
 
-`C-c b g` (`beeminder-my-goals-org`) - Fetches all of your goals from Beeminder
-and inserts them as a list of org-mode headlines.
+`C-c b g` (`beeminder-goals`) - Fetches all of your goals from Beeminder and
+displays them in a separate buffer. See "[The goals buffer](#the-goals-buffer)"
+for more information on how to use this.
 
-`C-c b w` (`beeminder-whoami`) - Fetches your username from Beeminder.
+`C-c b i` (`beeminder-my-goals-org`) - Fetches all of your goals from Beeminder
+and inserts them in the current buffer as a list of org-mode headlines.
+
+`C-c b r` (`beeminder-refresh-goal`) - Update the current org-mode headline with
+information from Beeminder.
 
 `C-c b t` (`beeminder-submit-clocked-time`) - Submits clocked time for the
 current goal (and any of its sub-tasks).
 
+`C-c b w` (`beeminder-whoami`) - Fetches your username from Beeminder.
 
 ## Usage
 
@@ -93,6 +100,11 @@ current goal (and any of its sub-tasks).
 #### `beeminder-add-data`
 
 Directly add data to a beeminder goal.
+
+#### `beeminder-goals`
+
+Fetches all goals for the current user (set via `beeminder-username`) and
+displays them in an interactive buffer.
 
 #### `beeminder-my-goals-org`
 
@@ -119,6 +131,37 @@ minutes clocked as the value.  If the goal property `beeminder-unit` is set to
 Fetches the username associated with the current token (set via
 `beeminder-auth-token`).  Not really useful, but good for checking if your
 authorization token is set and valid.
+
+### The goals buffer
+
+**beeminder.el** can browse your Beeminder goals directly from Emacs. Once your
+token has been configured, call `M-x beeminder-goals` to be open the goals
+buffer. It looks like this:
+
+![Viewing goals with
+beeminder.el](https://www.philnewton.net/assets/images/code/beeminder-el-all-goals.png)
+
+To refresh the list of goals, press <kbd>g</kbd>.
+
+To close the buffer, press <kbd>q</kbd>.
+
+To view information about a single goal, press <kbd>[enter]</kbd> when highlighting the
+goal to view. 
+
+The single goal buffer looks like this:
+
+![Viewing a single goal with
+beeminder.el](https://www.philnewton.net/assets/images/code/beeminder-el-single-goal.png)
+
+Like the goals view, pressing <kbd>g</kbd> will refresh the buffer. 
+
+Pressing <kbd>q</kbd> will close the buffer.
+
+Data can be added to the current goal by pressing <kbd>a</kbd>. This will prompt
+for a value and optional comment.
+
+To view all datapoints for the current goal, move the cursor to "__View all
+data__" and press the <kbd>[enter]</kbd> key.
 
 
 ### Integrating with org-mode
