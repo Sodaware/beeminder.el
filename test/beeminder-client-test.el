@@ -192,7 +192,7 @@
     (let ((beeminder-username "test_user")
           (goal                (read-fixture "example_goal.json")))
       (beeminder--initialize-goal-buffer goal)
-      (should (string= "Recent data" (buffer-line-contents 26)))
+      (should (string= "Recent data (4)" (buffer-line-contents 26)))
       (should (string= "Date          Value     Comment" (buffer-line-contents 28)))
       (should (string= "2020-05-08      1.0     First example data point" (buffer-line-contents 29)))
       (should (string= "2020-05-05      0.5     Second example data point" (buffer-line-contents 30))))))

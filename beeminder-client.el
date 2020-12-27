@@ -39,12 +39,6 @@
   :type '(string)
   :group 'beeminder)
 
-(defcustom beeminder-client-datapoints-per-page
-  10
-  "The number of datapoints to show per page."
-  :type '(integer)
-  :group 'beeminder)
-
 (defvar beeminder-buffer-goal nil
   "The goal being viewed in the current beeminder-goal buffer.")
 
@@ -231,8 +225,7 @@ GOAL must be an associative array of goal information from the API."
   ;; Fetch and display datapoints.
   ;; TODO: This is ugly.
   (let ((datapoints (beeminder-get-datapoints beeminder-username
-                                              (assoc-default 'slug goal)
-                                              (list :per beeminder-client-datapoints-per-page))))
+                                              (assoc-default 'slug goal))))
     (if (= 0 (length datapoints))
         (insert "No recent datapoints\n")
         (seq-doseq (datapoint datapoints)
